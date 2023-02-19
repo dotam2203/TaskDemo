@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray_100">#BDBDBD</color>
+    <color name="gray_200">#999</color>
+    <color name="gray_300">#646464</color>
+    <color name="trans">@android:color/transparent</color>
+    <dimen name="picker_default_divider_height">1dp</dimen>
+    <drawable name="picker_default_divider">@drawable/picker_divider</drawable>
 </resources>

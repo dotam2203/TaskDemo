@@ -1,0 +1,71 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:id="@+id/sheetContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/border_top"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/border_top">
+
+            <TextView
+                android:id="@+id/sheetTitle"
+                android:minWidth="80dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start|center_vertical"
+                android:gravity="center"
+                android:text="title here"
+                android:layout_marginLeft="12dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                />
+        </FrameLayout>
+        <com.task.libraries.SingleDatePicker
+            android:id="@+id/picker"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_weight="1"
+            app:picker_curved="true"
+            app:picker_cyclic="true"
+            app:picker_selectedTextColor="@color/black"
+            app:picker_textSize="20sp"
+            app:picker_visibleItemCount="7" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tbDateBirthday"
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+            <TextView
+                android:id="@+id/tvCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:textColor="@color/black"
+                android:layout_marginStart="30dp"/>
+            <TextView
+                android:id="@+id/tvApply"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:text="@string/apply"
+                android:layout_gravity="end|center_vertical"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/border_button"
+                android:gravity="center"
+                android:layout_marginEnd="40dp"/>
+        </androidx.appcompat.widget.Toolbar>
+
+    </LinearLayout>
+</FrameLayout>
