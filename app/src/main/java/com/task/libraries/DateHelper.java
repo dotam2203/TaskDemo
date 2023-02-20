@@ -14,10 +14,6 @@ public class DateHelper {
         this.timeZone = TimeZone.getDefault();
     }
 
-    public DateHelper(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
     public void setTimeZone(TimeZone timeZoneValue) {
         timeZone = timeZoneValue;
     }

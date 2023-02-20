@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public abstract class BaseDialog {
-    public static final int DEFAULT_ITEM_COUNT_MODE_CURVED = 7;
-    public static final int DEFAULT_ITEM_COUNT_MODE_NORMAL = 5;
 
     private boolean isDisplaying;
 
@@ -63,10 +61,6 @@ public abstract class BaseDialog {
 
     public void dismiss() {
         this.isDisplaying = false;
-    }
-
-    public boolean isDisplaying() {
-        return isDisplaying;
     }
 
     public void setBackgroundColor(@ColorInt Integer backgroundColor) {

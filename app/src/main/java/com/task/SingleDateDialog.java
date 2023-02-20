@@ -1,7 +1,5 @@
 package com.task;
 
-import static com.task.libraries.SingleDateConstants.STEP_MINUTES_DEFAULT;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +43,7 @@ public class SingleDateDialog extends BaseDialog {
     }
 
     private SingleDateDialog(Context context, boolean bottomSheet) {
-        final int layout = bottomSheet ? R.layout.custom_date_picker : R.layout.custom_date_picker;
+        final int layout = R.layout.custom_date_picker;
         this.bottomSheetHelper = new BottomSheetHelper(context, layout);
 
         this.bottomSheetHelper.setListener(new BottomSheetHelper.Listener() {

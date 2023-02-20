@@ -267,14 +267,6 @@ public abstract class WheelPicker<V> extends View {
         }
     }
 
-    public void selectDate(Date date) {
-        setSelectedItemPosition(findIndexOfDate(date));
-    }
-
-    public void setListener(Listener listener) {
-        this.listener = listener;
-    }
-
     public void setCustomLocale(Locale customLocale) {
         this.customLocale = customLocale;
     }
@@ -683,32 +675,16 @@ public abstract class WheelPicker<V> extends View {
         return String.valueOf(value);
     }
 
-    public int getVisibleItemCount() {
-        return mVisibleItemCount;
-    }
-
     public void setVisibleItemCount(int count) {
         mVisibleItemCount = count;
         updateVisibleItemCount();
         requestLayout();
     }
 
-    public boolean isCyclic() {
-        return isCyclic;
-    }
-
     public void setCyclic(boolean isCyclic) {
         this.isCyclic = isCyclic;
         computeFlingLimitY();
         invalidate();
-    }
-
-    public void setOnItemSelectedListener(OnItemSelectedListener listener) {
-        onItemSelectedListener = listener;
-    }
-
-    public int getSelectedItemPosition() {
-        return selectedItemPosition;
     }
 
     public void setSelectedItemPosition(int position) {
@@ -767,69 +743,15 @@ public abstract class WheelPicker<V> extends View {
         postInvalidate();
     }
 
-    public void setSameWidth(boolean hasSameWidth) {
-        this.hasSameWidth = hasSameWidth;
-        computeTextSize();
-        requestLayout();
-        invalidate();
-    }
-
-    public boolean hasSameWidth() {
-        return hasSameWidth;
-    }
-
-    public void setOnWheelChangeListener(OnWheelChangeListener listener) {
-        onWheelChangeListener = listener;
-    }
-
-    public String getMaximumWidthText() {
-        return maxWidthText;
-    }
-
-    public void setMaximumWidthText(String text) {
-        if (null == text) throw new NullPointerException("Maximum width text can not be null!");
-        maxWidthText = text;
-        computeTextSize();
-        requestLayout();
-        postInvalidate();
-    }
-
-    public int getMaximumWidthTextPosition() {
-        return textMaxWidthPosition;
-    }
-
-    public void setMaximumWidthTextPosition(int position) {
-        if (!isPosInRang(position)) {
-            throw new ArrayIndexOutOfBoundsException("Maximum width text Position must in [0, " +
-                    adapter.getItemCount() + "), but current is " + position);
-        }
-        textMaxWidthPosition = position;
-        computeTextSize();
-        requestLayout();
-        postInvalidate();
-    }
-
-    public int getSelectedItemTextColor() {
-        return mSelectedItemTextColor;
-    }
-
     public void setSelectedItemTextColor(int color) {
         mSelectedItemTextColor = color;
         computeCurrentItemRect();
         postInvalidate();
     }
 
-    public int getItemTextColor() {
-        return mItemTextColor;
-    }
-
     public void setItemTextColor(int color) {
         mItemTextColor = color;
         postInvalidate();
-    }
-
-    public int getItemTextSize() {
-        return mItemTextSize;
     }
 
     public void setItemTextSize(int size) {
@@ -841,10 +763,6 @@ public abstract class WheelPicker<V> extends View {
             requestLayout();
             postInvalidate();
         }
-    }
-
-    public int getItemSpace() {
-        return mItemSpace;
     }
 
     public void setItemSpace(int space) {
@@ -859,75 +777,10 @@ public abstract class WheelPicker<V> extends View {
         postInvalidate();
     }
 
-    public void setIndicator(boolean hasIndicator) {
-        this.hasIndicator = hasIndicator;
-        computeIndicatorRect();
-        postInvalidate();
-    }
-
-    public boolean hasIndicator() {
-        return hasIndicator;
-    }
-
-    public int getIndicatorSize() {
-        return mIndicatorSize;
-    }
-
-    public void setIndicatorSize(int size) {
-        mIndicatorSize = size;
-        computeIndicatorRect();
-        postInvalidate();
-    }
-
-    public int getIndicatorColor() {
-        return mIndicatorColor;
-    }
-
-    public void setIndicatorColor(int color) {
-        mIndicatorColor = color;
-        postInvalidate();
-    }
-
-    public void setCurtain(boolean hasCurtain) {
-        this.hasCurtain = hasCurtain;
-        computeCurrentItemRect();
-        postInvalidate();
-    }
-
-    public boolean hasCurtain() {
-        return hasCurtain;
-    }
-
-    public int getCurtainColor() {
-        return mCurtainColor;
-    }
-
-    public void setCurtainColor(int color) {
-        mCurtainColor = color;
-        postInvalidate();
-    }
-
-    public void setAtmospheric(boolean hasAtmospheric) {
-        this.hasAtmospheric = hasAtmospheric;
-        postInvalidate();
-    }
-
-    public boolean hasAtmospheric() {
-        return hasAtmospheric;
-    }
-
-    public boolean isCurved() {
-        return isCurved;
-    }
-
     public void setCurved(boolean isCurved) {
         this.isCurved = isCurved;
         requestLayout();
         postInvalidate();
-    }
-
-    public int getItemAlign() {
-        return mItemAlign;
     }
 
     public void setItemAlign(int align) {
@@ -935,11 +788,6 @@ public abstract class WheelPicker<V> extends View {
         updateItemTextAlign();
         computeDrawnCenter();
         postInvalidate();
-    }
-
-    public Typeface getTypeface() {
-        if (null != paint) return paint.getTypeface();
-        return null;
     }
 
     public void setTypeface(Typeface tf) {
@@ -1035,10 +883,6 @@ public abstract class WheelPicker<V> extends View {
 
     public void setDateHelper(DateHelper dateHelper) {
         this.dateHelper = dateHelper;
-    }
-
-    public DateHelper getDateHelper() {
-        return dateHelper;
     }
 
     public void setShowOnlyFutureDate(boolean showOnlyFutureDate) {
@@ -1153,10 +997,6 @@ public abstract class WheelPicker<V> extends View {
 
         public void setData(List<V> data) {
             this.data.clear();
-            this.data.addAll(data);
-        }
-
-        public void addData(List<V> data) {
             this.data.addAll(data);
         }
 

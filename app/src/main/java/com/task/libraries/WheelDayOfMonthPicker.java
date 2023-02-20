@@ -59,10 +59,6 @@ public class WheelDayOfMonthPicker extends WheelPicker<String> {
         this.listener = listener;
     }
 
-    public int getDaysInMonth() {
-        return daysInMonth;
-    }
-
     public void setDaysInMonth(int daysInMonth) {
         this.daysInMonth = daysInMonth;
     }
