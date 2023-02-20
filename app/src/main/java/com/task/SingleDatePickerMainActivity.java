@@ -51,7 +51,7 @@ public class SingleDatePickerMainActivity extends AppCompatActivity {
     public void simpleClicked() {
 
         final Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 17); // 4. Feb. 2018
+        calendar.set(Calendar.DAY_OF_MONTH, 17); // 17. Feb. 2023
         calendar.set(Calendar.MONTH, 2);
         calendar.set(Calendar.YEAR, 2023);
         calendar.set(Calendar.HOUR_OF_DAY, 11);

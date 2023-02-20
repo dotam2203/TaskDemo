@@ -60,7 +60,6 @@ public class SingleDateDialog extends BaseDialog {
                     displayListener.onDisplayed(picker);
                 }
             }
-
             @Override
             public void onClose() {
                 SingleDateDialog.this.onClose();
@@ -256,6 +255,10 @@ public class SingleDateDialog extends BaseDialog {
         this.dayFormatter = dayFormatter;
         return this;
     }
+    public SingleDateDialog setFocusable(boolean focusable) {
+        bottomSheetHelper.setFocusable(focusable);
+        return this;
+    }
 
     public SingleDateDialog setCustomLocale(Locale locale) {
         this.customLocale = locale;
@@ -269,11 +272,13 @@ public class SingleDateDialog extends BaseDialog {
     @Override
     public void display() {
         super.display();
+        bottomSheetHelper.display();
     }
 
     @Override
     public void close() {
         super.close();
+        bottomSheetHelper.hide();
 
         if (listener != null && okClicked) {
             listener.onDateSelected(picker.getDate());
@@ -283,6 +288,7 @@ public class SingleDateDialog extends BaseDialog {
     @Override
     public void dismiss() {
         super.dismiss();
+        bottomSheetHelper.dismiss();
     }
 
     public interface Listener {
@@ -495,7 +501,8 @@ public class SingleDateDialog extends BaseDialog {
                     .setDayFormatter(dayFormatter)
                     .setCustomLocale(customLocale)
                     .setMustBeOnFuture(mustBeOnFuture)
-                    .setTimeZone(timeZone);
+                    .setTimeZone(timeZone)
+                    .setFocusable(focusable);
 
             if (mainColor != null) {
                 dialog.setMainColor(mainColor);
