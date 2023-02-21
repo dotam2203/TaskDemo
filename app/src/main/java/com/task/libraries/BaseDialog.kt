@@ -1,81 +1,64 @@
-package com.task.libraries;
-import android.graphics.Color;
+package com.task.libraries
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.graphics.Color
+import androidx.annotation.ColorInt
+import java.text.SimpleDateFormat
+import java.util.*
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+abstract class BaseDialog {
+    private var isDisplaying = false
 
-public abstract class BaseDialog {
-
-    private boolean isDisplaying;
-
-    @Nullable
     @ColorInt
-    protected Integer backgroundColor = Color.WHITE;
+    protected var backgroundColor: Int? = Color.WHITE
 
-    @Nullable
     @ColorInt
-    protected Integer mainColor = Color.BLACK;
+    protected var mainColor: Int? = Color.BLACK
 
-    @Nullable
     @ColorInt
-    protected Integer buttonColor = Color.WHITE;
+    protected var buttonColor: Int? = Color.WHITE
 
-    @Nullable
     @ColorInt
-    protected Integer titleTextColor = null;
-
-    protected boolean okClicked = false;
-    protected boolean curved = false;
-    protected boolean mustBeOnFuture = false;
-
-    @Nullable
-    protected Date minDate;
-    @Nullable
-    protected Date maxDate;
-    @Nullable
-    protected Date defaultDate;
-
-    protected boolean displayDays;
-    protected boolean displayDaysOfMonth;
-    protected boolean displayMonth;
-    protected boolean displayYears;
-    protected boolean displayMonthNumbers;
-
-
-    protected SimpleDateFormat dayFormatter;
-
-    protected Locale customLocale;
-
-    public void display() {
-        this.isDisplaying = true;
+    protected var titleTextColor: Int? = null
+    protected var okClicked = false
+    protected var curved = false
+    protected var mustBeOnFuture = false
+    protected var minDate: Date? = null
+    protected var maxDate: Date? = null
+    protected var defaultDate: Date? = null
+    protected var displayDays = false
+    protected var displayDaysOfMonth = false
+    protected var displayMonth = false
+    protected var displayYears = false
+    protected var displayMonthNumbers = false
+    protected var dayFormatter: SimpleDateFormat? = null
+    protected var customLocale: Locale? = null
+    open fun display() {
+        isDisplaying = true
     }
 
-    public void close() {
-        this.isDisplaying = false;
+    open fun close() {
+        isDisplaying = false
     }
 
-    public void dismiss() {
-        this.isDisplaying = false;
+    open fun dismiss() {
+        isDisplaying = false
     }
 
-    public void setBackgroundColor(@ColorInt Integer backgroundColor) {
-        this.backgroundColor = backgroundColor;
+    @JvmName("setBackgroundColor1")
+    fun setBackgroundColor(@ColorInt backgroundColor: Int?) {
+        this.backgroundColor = backgroundColor
     }
 
-    public void setMainColor(@ColorInt Integer mainColor) {
-        this.mainColor = mainColor;
+    @JvmName("setMainColor1")
+    fun setMainColor(@ColorInt mainColor: Int?) {
+        this.mainColor = mainColor
     }
 
-    public void setTitleTextColor(@NonNull @ColorInt int titleTextColor) {
-        this.titleTextColor = titleTextColor;
+    fun setTitleTextColor(@ColorInt titleTextColor: Int) {
+        this.titleTextColor = titleTextColor
     }
 
-    protected void onClose() {
-        this.isDisplaying = false;
+    protected fun onClose() {
+        isDisplaying = false
     }
 }
