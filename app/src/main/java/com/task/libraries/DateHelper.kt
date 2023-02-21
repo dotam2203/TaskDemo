@@ -1,46 +1,46 @@
-package com.task.libraries;
+package com.task.libraries
 
-import androidx.annotation.NonNull;
+import java.util.*
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
-public class DateHelper {
+class DateHelper {
     // Don't use static, as timezone may change while app is alive
-    private TimeZone timeZone = TimeZone.getDefault();
-
-    public DateHelper() {
-        this.timeZone = TimeZone.getDefault();
+    private var timeZone = TimeZone.getDefault()
+    fun setTimeZone(timeZoneValue: TimeZone) {
+        timeZone = timeZoneValue
     }
 
-    public void setTimeZone(TimeZone timeZoneValue) {
-        timeZone = timeZoneValue;
-    }
-
-    @NonNull
-    public TimeZone getTimeZone() {
-        if(this.timeZone == null) {
-            return TimeZone.getDefault();
+    fun getTimeZone(): TimeZone {
+        return if (timeZone == null) {
+            TimeZone.getDefault()
         } else {
-            return timeZone;
+            timeZone
         }
     }
-    public Calendar getCalendarOfDate(Date date) {
-        final Calendar calendar = Calendar.getInstance(getTimeZone());
-        calendar.setTime(date);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar;
+
+    fun getCalendarOfDate(date: Date?): Calendar {
+        val calendar = Calendar.getInstance(getTimeZone())
+        if (date != null) {
+            calendar.time = date
+        }
+        calendar[Calendar.MILLISECOND] = 0
+        calendar[Calendar.SECOND] = 0
+        return calendar
     }
-    public Date today() {
-        Calendar now = Calendar.getInstance(getTimeZone());
-        return now.getTime();
+
+    fun today(): Date {
+        val now = Calendar.getInstance(getTimeZone())
+        return now.time
     }
-    public int getMonth(Date date) {
-        return getCalendarOfDate(date).get(Calendar.MONTH);
+
+    fun getMonth(date: Date?): Int {
+        return getCalendarOfDate(date)[Calendar.MONTH]
     }
-    public int getDay(Date date) {
-        return getCalendarOfDate(date).get(Calendar.DAY_OF_MONTH);
+
+    fun getDay(date: Date?): Int {
+        return getCalendarOfDate(date)[Calendar.DAY_OF_MONTH]
+    }
+
+    init {
+        timeZone = TimeZone.getDefault()
     }
 }

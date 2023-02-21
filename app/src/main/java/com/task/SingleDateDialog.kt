@@ -188,7 +188,9 @@ class SingleDateDialog private constructor(context: Context, bottomSheet: Boolea
     }
 
     private fun setTimeZone(timeZone: TimeZone?): SingleDateDialog {
-        dateHelper.setTimeZone(timeZone)
+        if (timeZone != null) {
+            dateHelper.setTimeZone(timeZone)
+        }
         return this
     }
 
