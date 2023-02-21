@@ -22,7 +22,6 @@ class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: Attrib
     private val daysOfMonthPicker: WheelDayOfMonthPicker
     private val daysPicker: WheelDayPicker
     private val pickers: MutableList<WheelPicker<*>> = ArrayList()
-    private val listeners: List<OnDateChangedListener> = ArrayList()
     private val dtSelector: View
     private var mustBeOnFuture = false
     private var minDate: Date? = null
@@ -367,11 +366,6 @@ class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: Attrib
         }
         daysPicker.updateAdapter() // For MustBeFuture and dayCount
     }
-
-    interface OnDateChangedListener {
-        fun onDateChanged(displayed: String?, date: Date?)
-    }
-
     companion object {
         const val IS_CYCLIC_DEFAULT = true
         const val IS_CURVED_DEFAULT = false
@@ -382,14 +376,13 @@ class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     init {
-        binding = DatePickerSpinnerBinding.inflate(LayoutInflater.from(context),null,false)
         defaultDate = Date()
-        inflate(context, R.layout.date_picker_spinner, this)
-        yearsPicker = findViewById(R.id.yearPicker)
-        monthPicker = findViewById(R.id.monthPicker)
-        daysOfMonthPicker = findViewById(R.id.daysOfMonthPicker)
-        daysPicker = findViewById(R.id.daysPicker)
-        dtSelector = findViewById(R.id.dtSelector)
+        binding = DatePickerSpinnerBinding.inflate(LayoutInflater.from(context),this,true)
+        yearsPicker = binding.yearPicker
+        monthPicker = binding.monthPicker
+        daysOfMonthPicker = binding.daysOfMonthPicker
+        daysPicker = binding.daysPicker
+        dtSelector = binding.dtSelector
         pickers.addAll(
             listOf(
                 daysPicker,
