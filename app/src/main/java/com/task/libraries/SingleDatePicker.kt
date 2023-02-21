@@ -1,486 +1,406 @@
-package com.task.libraries;
+package com.task.libraries
 
-import static com.task.libraries.SingleDateConstants.DAYS_PADDING;
+import android.content.Context
+import android.graphics.Typeface
+import android.text.TextUtils
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.task.R
+import com.task.databinding.DatePickerSpinnerBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Typeface;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import com.task.R;
-
-
-public class SingleDatePicker extends LinearLayout {
-
-    public static final boolean IS_CYCLIC_DEFAULT = true;
-    public static final boolean IS_CURVED_DEFAULT = false;
-    public static final boolean MUST_BE_ON_FUTURE_DEFAULT = false;
-    public static final int DELAY_BEFORE_CHECK_PAST = 200;
-    private static final int VISIBLE_ITEM_COUNT_DEFAULT = 7;
-    public static final int ALIGN_CENTER = 0;
-    private DateHelper dateHelper = new DateHelper();
-
-    @NonNull
-    private final WheelYearPicker yearsPicker;
-
-    @NonNull
-    private final WheelMonthPicker monthPicker;
-
-    @NonNull
-    private final WheelDayOfMonthPicker daysOfMonthPicker;
-
-    @NonNull
-    private final WheelDayPicker daysPicker;
-
-    private List<WheelPicker> pickers = new ArrayList<>();
-
-    private List<OnDateChangedListener> listeners = new ArrayList<>();
-
-    private View dtSelector;
-    private boolean mustBeOnFuture;
-
-    @Nullable
-    private Date minDate;
-    @Nullable
-    private Date maxDate;
-    @NonNull
-    private Date defaultDate;
-
-    private boolean displayYears = false;
-    private boolean displayMonth = false;
-    private boolean displayDaysOfMonth = false;
-    private boolean displayDays = true;
-
-    public SingleDatePicker(Context context) {
-        this(context, null);
+class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : LinearLayout(context, attrs, defStyleAttr) {
+    private lateinit var binding: DatePickerSpinnerBinding
+    private var dateHelper = DateHelper()
+    private val yearsPicker: WheelYearPicker
+    private val monthPicker: WheelMonthPicker
+    private val daysOfMonthPicker: WheelDayOfMonthPicker
+    private val daysPicker: WheelDayPicker
+    private val pickers: MutableList<WheelPicker<*>> = ArrayList()
+    private val listeners: List<OnDateChangedListener> = ArrayList()
+    private val dtSelector: View
+    private var mustBeOnFuture = false
+    private var minDate: Date? = null
+    private var maxDate: Date? = null
+    private var defaultDate: Date
+    private var displayYears = false
+    private var displayMonth = false
+    private var displayDaysOfMonth = false
+    private var displayDays = true
+    fun setDateHelper(dateHelper: DateHelper) {
+        this.dateHelper = dateHelper
     }
 
-    public SingleDatePicker(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        yearsPicker.setOnYearSelectedListener { picker, position, year ->
+            checkMinMaxDate(picker)
+            if (displayDaysOfMonth) {
+                updateDaysOfMonth()
+            }
+        }
+        monthPicker.setOnMonthSelectedListener { picker, monthIndex, monthName ->
+            checkMinMaxDate(picker)
+            if (displayDaysOfMonth) {
+                updateDaysOfMonth()
+            }
+        }
+        daysOfMonthPicker
+            .setDayOfMonthSelectedListener { picker, dayIndex -> checkMinMaxDate(picker) }
+        daysOfMonthPicker
+            .setOnFinishedLoopListener {
+                if (displayMonth) {
+                    monthPicker.scrollTo(monthPicker.currentItemPosition + 1)
+                    updateDaysOfMonth()
+                }
+            }
+        daysPicker
+            .setOnDaySelectedListener { picker, position, name, date -> checkMinMaxDate(picker) }
+        setDefaultDate(defaultDate) //update displayed date
     }
 
-    public SingleDatePicker(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        for (picker in pickers) {
+            picker.isEnabled = enabled
+        }
+    }
 
-        defaultDate = new Date();
+    fun setDisplayYears(displayYears: Boolean) {
+        this.displayYears = displayYears
+        yearsPicker.visibility = if (displayYears) VISIBLE else GONE
+    }
 
-        inflate(context, R.layout.date_picker_spinner, this);
+    fun setDisplayMonths(displayMonths: Boolean) {
+        displayMonth = displayMonths
+        monthPicker.visibility = if (displayMonths) VISIBLE else GONE
+        checkSettings()
+    }
 
-        yearsPicker = findViewById(R.id.yearPicker);
-        monthPicker = findViewById(R.id.monthPicker);
-        daysOfMonthPicker = findViewById(R.id.daysOfMonthPicker);
-        daysPicker = findViewById(R.id.daysPicker);
-        dtSelector = findViewById(R.id.dtSelector);
+    fun setDisplayDaysOfMonth(displayDaysOfMonth: Boolean) {
+        this.displayDaysOfMonth = displayDaysOfMonth
+        daysOfMonthPicker.visibility = if (displayDaysOfMonth) VISIBLE else GONE
+        if (displayDaysOfMonth) {
+            updateDaysOfMonth()
+        }
+        checkSettings()
+    }
 
-        pickers.addAll(Arrays.asList(
+    fun setDisplayDays(displayDays: Boolean) {
+        this.displayDays = displayDays
+        daysPicker.visibility = if (displayDays) VISIBLE else GONE
+        checkSettings()
+    }
+
+    fun setDisplayMonthNumbers(displayMonthNumbers: Boolean) {
+        monthPicker.setDisplayMonthNumbers(displayMonthNumbers)
+        monthPicker.updateAdapter()
+    }
+
+    fun setMonthFormat(monthFormat: String?) {
+        monthPicker.monthFormat = monthFormat
+        monthPicker.updateAdapter()
+    }
+
+    fun setTodayText(todayText: DateWithLabel?) {
+        if (todayText?.label != null && todayText.label.isNotEmpty()) {
+            daysPicker.setTodayText(todayText)
+        }
+    }
+
+    fun setItemSpacing(size: Int) {
+        for (picker in pickers) {
+            picker.setItemSpace(size)
+        }
+    }
+
+    fun setCurvedMaxAngle(angle: Int) {
+        for (picker in pickers) {
+            picker.setCurvedMaxAngle(angle)
+        }
+    }
+
+    fun setCurved(curved: Boolean) {
+        for (picker in pickers) {
+            picker.setCurved(curved)
+        }
+    }
+
+    fun setCyclic(cyclic: Boolean) {
+        for (picker in pickers) {
+            picker.setCyclic(cyclic)
+        }
+    }
+
+    fun setTextSize(textSize: Int) {
+        for (picker in pickers) {
+            picker.setItemTextSize(textSize)
+        }
+    }
+
+    fun setSelectedTextColor(selectedTextColor: Int) {
+        for (picker in pickers) {
+            picker.setSelectedItemTextColor(selectedTextColor)
+        }
+    }
+
+    fun setTextColor(textColor: Int) {
+        for (picker in pickers) {
+            picker.setItemTextColor(textColor)
+        }
+    }
+
+    fun setTextAlign(align: Int) {
+        for (picker in pickers) {
+            picker.setItemAlign(align)
+        }
+    }
+
+    fun setTypeface(typeface: Typeface?) {
+        if (typeface == null) return
+        for (picker in pickers) {
+            picker.setTypeface(typeface)
+        }
+    }
+
+    private fun setFontToAllPickers(resourceId: Int) {
+        if (resourceId > 0) {
+            for (i in pickers.indices) {
+                pickers[i].setTypeface(ResourcesCompat.getFont(context, resourceId))
+            }
+        }
+    }
+
+    fun setSelectorColor(selectorColor: Int) {
+        dtSelector.setBackgroundColor(selectorColor)
+    }
+
+    fun setSelectorHeight(selectorHeight: Int) {
+        val dtSelectorLayoutParams = dtSelector.layoutParams
+        dtSelectorLayoutParams.height = selectorHeight
+        dtSelector.layoutParams = dtSelectorLayoutParams
+    }
+
+    fun setVisibleItemCount(visibleItemCount: Int) {
+        for (picker in pickers) {
+            picker.setVisibleItemCount(visibleItemCount)
+        }
+    }
+
+    fun setDayFormatter(simpleDateFormat: SimpleDateFormat?) {
+        if (simpleDateFormat != null) {
+            daysPicker.setDayFormatter(simpleDateFormat)
+        }
+    }
+
+    fun setMinDate(minDate: Date?) {
+        val calendar = Calendar.getInstance()
+        calendar.timeZone = dateHelper.getTimeZone()
+        calendar.time = minDate
+        this.minDate = calendar.time
+        setMinYear()
+    }
+
+    fun setMaxDate(maxDate: Date?) {
+        val calendar = Calendar.getInstance()
+        calendar.timeZone = dateHelper.getTimeZone()
+        calendar.time = maxDate
+        this.maxDate = calendar.time
+        setMinYear()
+    }
+
+    fun setCustomLocale(locale: Locale?) {
+        for (p in pickers) {
+            p.setCustomLocale(locale)
+            p.updateAdapter()
+        }
+    }
+
+    private fun checkMinMaxDate(picker: WheelPicker<*>) {
+        checkBeforeMinDate(picker)
+        checkAfterMaxDate(picker)
+    }
+
+    private fun checkBeforeMinDate(picker: WheelPicker<*>) {
+        picker.postDelayed({
+            if (minDate != null && isBeforeMinDate(date)) {
+                for (p in pickers) {
+                    p.scrollTo(p.findIndexOfDate(minDate!!))
+                }
+            }
+        }, DELAY_BEFORE_CHECK_PAST.toLong())
+    }
+
+    private fun checkAfterMaxDate(picker: WheelPicker<*>) {
+        picker.postDelayed({
+            if (maxDate != null && isAfterMaxDate(date)) {
+                for (p in pickers) {
+                    p.scrollTo(p.findIndexOfDate(maxDate!!))
+                }
+            }
+        }, DELAY_BEFORE_CHECK_PAST.toLong())
+    }
+
+    private fun isBeforeMinDate(date: Date): Boolean {
+        return dateHelper.getCalendarOfDate(date).before(dateHelper.getCalendarOfDate(minDate))
+    }
+
+    private fun isAfterMaxDate(date: Date): Boolean {
+        return dateHelper.getCalendarOfDate(date).after(dateHelper.getCalendarOfDate(maxDate))
+    }
+
+    val date: Date
+        get() {
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            if (displayDays) {
+                val dayDate = daysPicker.currentDate
+                calendar.time = dayDate
+            } else {
+                if (displayMonth) {
+                    calendar[Calendar.MONTH] = monthPicker.currentMonth
+                }
+                if (displayYears) {
+                    calendar[Calendar.YEAR] = yearsPicker.currentYear
+                }
+                if (displayDaysOfMonth) {
+                    val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                    if (daysOfMonthPicker.currentDay >= daysInMonth) {
+                        calendar[Calendar.DAY_OF_MONTH] = daysInMonth
+                    } else {
+                        calendar[Calendar.DAY_OF_MONTH] = daysOfMonthPicker.currentDay + 1
+                    }
+                }
+            }
+            return calendar.time
+        }
+
+    fun setDefaultDate(date: Date?) {
+        if (date != null) {
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            calendar.time = date
+            defaultDate = calendar.time
+            updateDaysOfMonth(calendar)
+            for (picker in pickers) {
+                picker.setDefaultDate(defaultDate)
+            }
+        }
+    }
+
+    private fun updateDaysOfMonth() {
+        val date = date
+        val calendar = Calendar.getInstance()
+        calendar.timeZone = dateHelper.getTimeZone()
+        calendar.time = date
+        updateDaysOfMonth(calendar)
+    }
+
+    private fun updateDaysOfMonth(calendar: Calendar) {
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        daysOfMonthPicker.setDaysInMonth(daysInMonth)
+        daysOfMonthPicker.updateAdapter()
+    }
+
+    fun setMustBeOnFuture(mustBeOnFuture: Boolean) {
+        this.mustBeOnFuture = mustBeOnFuture
+        daysPicker.showOnlyFutureDate = mustBeOnFuture
+        if (mustBeOnFuture) {
+            val now = Calendar.getInstance()
+            now.timeZone = dateHelper.getTimeZone()
+            minDate = now.time //minDate is Today
+        }
+    }
+
+    private fun setMinYear() {
+        if (displayYears && minDate != null && maxDate != null) {
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            calendar.time = minDate
+            yearsPicker.setMinYear(calendar[Calendar.YEAR])
+            calendar.time = maxDate
+            yearsPicker.setMaxYear(calendar[Calendar.YEAR])
+        }
+    }
+
+    private fun checkSettings() {
+        require(!(displayDays && (displayDaysOfMonth || displayMonth))) { "You can either display days with months or days and months separately" }
+    }
+
+    private fun init(context: Context, attrs: AttributeSet?) {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.SingleDatePicker)
+        val resources = resources
+        setTodayText(DateWithLabel(a.getString(R.styleable.SingleDatePicker_picker_todayText), Date()))
+        setTextColor(a.getColor(R.styleable.SingleDatePicker_picker_textColor, ContextCompat.getColor(context, R.color.gray_200)))
+        setSelectedTextColor(a.getColor(R.styleable.SingleDatePicker_picker_selectedTextColor, ContextCompat.getColor(context, R.color.black)))
+        setSelectorColor(a.getColor(R.styleable.SingleDatePicker_picker_selectorColor, ContextCompat.getColor(context, R.color.gray_300)))
+        setItemSpacing(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_itemSpacing, resources.getDimensionPixelSize(R.dimen.wheelSelectorHeight)))
+        setCurvedMaxAngle(a.getInteger(R.styleable.SingleDatePicker_picker_curvedMaxAngle, WheelPicker.MAX_ANGLE))
+        setSelectorHeight(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_selectorHeight, resources.getDimensionPixelSize(R.dimen.wheelSelectorHeight)))
+        setTextSize(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_textSize, resources.getDimensionPixelSize(R.dimen.WheelItemTextSize)))
+        setCurved(a.getBoolean(R.styleable.SingleDatePicker_picker_curved, IS_CURVED_DEFAULT))
+        setCyclic(a.getBoolean(R.styleable.SingleDatePicker_picker_cyclic, IS_CYCLIC_DEFAULT))
+        setMustBeOnFuture(a.getBoolean(R.styleable.SingleDatePicker_picker_mustBeOnFuture, MUST_BE_ON_FUTURE_DEFAULT))
+        setVisibleItemCount(a.getInt(R.styleable.SingleDatePicker_picker_visibleItemCount, VISIBLE_ITEM_COUNT_DEFAULT))
+        daysPicker.setDayCount(a.getInt(R.styleable.SingleDatePicker_picker_dayCount, SingleDateConstants.DAYS_PADDING))
+        setDisplayDays(a.getBoolean(R.styleable.SingleDatePicker_picker_displayDays, displayDays))
+        setDisplayMonths(a.getBoolean(R.styleable.SingleDatePicker_picker_displayMonth, displayMonth))
+        setDisplayYears(a.getBoolean(R.styleable.SingleDatePicker_picker_displayYears, displayYears))
+        setDisplayDaysOfMonth(a.getBoolean(R.styleable.SingleDatePicker_picker_displayDaysOfMonth, displayDaysOfMonth))
+        setDisplayMonthNumbers(a.getBoolean(R.styleable.SingleDatePicker_picker_displayMonthNumbers, monthPicker.displayMonthNumbers()))
+        setFontToAllPickers(a.getResourceId(R.styleable.SingleDatePicker_fontFamily, 0))
+        val monthFormat = a.getString(R.styleable.SingleDatePicker_picker_monthFormat)
+        setMonthFormat(if (TextUtils.isEmpty(monthFormat)) WheelMonthPicker.MONTH_FORMAT else monthFormat)
+        setTextAlign(a.getInt(R.styleable.SingleDatePicker_picker_textAlign, ALIGN_CENTER))
+        checkSettings()
+        setMinYear()
+        a.recycle()
+        if (displayDaysOfMonth) {
+            val now = Calendar.getInstance()
+            now.timeZone = dateHelper.getTimeZone()
+            updateDaysOfMonth(now)
+        }
+        daysPicker.updateAdapter() // For MustBeFuture and dayCount
+    }
+
+    interface OnDateChangedListener {
+        fun onDateChanged(displayed: String?, date: Date?)
+    }
+
+    companion object {
+        const val IS_CYCLIC_DEFAULT = true
+        const val IS_CURVED_DEFAULT = false
+        const val MUST_BE_ON_FUTURE_DEFAULT = false
+        const val DELAY_BEFORE_CHECK_PAST = 200
+        private const val VISIBLE_ITEM_COUNT_DEFAULT = 7
+        const val ALIGN_CENTER = 0
+    }
+
+    init {
+        binding = DatePickerSpinnerBinding.inflate(LayoutInflater.from(context),null,false)
+        defaultDate = Date()
+        inflate(context, R.layout.date_picker_spinner, this)
+        yearsPicker = findViewById(R.id.yearPicker)
+        monthPicker = findViewById(R.id.monthPicker)
+        daysOfMonthPicker = findViewById(R.id.daysOfMonthPicker)
+        daysPicker = findViewById(R.id.daysPicker)
+        dtSelector = findViewById(R.id.dtSelector)
+        pickers.addAll(
+            listOf(
                 daysPicker,
                 daysOfMonthPicker,
                 monthPicker,
                 yearsPicker
-        ));
-        for (WheelPicker wheelPicker : pickers) {
-            wheelPicker.setDateHelper(dateHelper);
+            )
+        )
+        for (wheelPicker in pickers) {
+            wheelPicker.setDateHelper(dateHelper)
         }
-        init(context, attrs);
-    }
-
-    public void setDateHelper(DateHelper dateHelper) {
-        this.dateHelper = dateHelper;
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        yearsPicker.setOnYearSelectedListener(new WheelYearPicker.OnYearSelectedListener() {
-            @Override
-            public void onYearSelected(WheelYearPicker picker, int position, int year) {
-                checkMinMaxDate(picker);
-
-                if (displayDaysOfMonth) {
-                    updateDaysOfMonth();
-                }
-            }
-        });
-
-        monthPicker.setOnMonthSelectedListener(new WheelMonthPicker.MonthSelectedListener() {
-            @Override
-            public void onMonthSelected(WheelMonthPicker picker, int monthIndex, String monthName) {
-                checkMinMaxDate(picker);
-
-                if (displayDaysOfMonth) {
-                    updateDaysOfMonth();
-                }
-            }
-        });
-
-        daysOfMonthPicker
-                .setDayOfMonthSelectedListener(new WheelDayOfMonthPicker.DayOfMonthSelectedListener() {
-                    @Override
-                    public void onDayOfMonthSelected(WheelDayOfMonthPicker picker, int dayIndex) {
-                        checkMinMaxDate(picker);
-                    }
-                });
-
-        daysOfMonthPicker
-                .setOnFinishedLoopListener(new WheelDayOfMonthPicker.FinishedLoopListener() {
-                    @Override
-                    public void onFinishedLoop(WheelDayOfMonthPicker picker) {
-                        if (displayMonth) {
-                            monthPicker.scrollTo(monthPicker.getCurrentItemPosition() + 1);
-                            updateDaysOfMonth();
-                        }
-                    }
-                });
-
-        daysPicker
-                .setOnDaySelectedListener(new WheelDayPicker.OnDaySelectedListener() {
-                    @Override
-                    public void onDaySelected(WheelDayPicker picker, int position, String name, Date date) {
-                        checkMinMaxDate(picker);
-                    }
-                });
-        setDefaultDate(this.defaultDate); //update displayed date
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        for (WheelPicker picker : pickers) {
-            picker.setEnabled(enabled);
-        }
-    }
-
-    public void setDisplayYears(boolean displayYears) {
-        this.displayYears = displayYears;
-        yearsPicker.setVisibility(displayYears ? VISIBLE : GONE);
-    }
-
-    public void setDisplayMonths(boolean displayMonths) {
-        this.displayMonth = displayMonths;
-        monthPicker.setVisibility(displayMonths ? VISIBLE : GONE);
-        checkSettings();
-    }
-
-    public void setDisplayDaysOfMonth(boolean displayDaysOfMonth) {
-        this.displayDaysOfMonth = displayDaysOfMonth;
-        daysOfMonthPicker.setVisibility(displayDaysOfMonth ? VISIBLE : GONE);
-
-        if (displayDaysOfMonth) {
-            updateDaysOfMonth();
-        }
-        checkSettings();
-    }
-
-    public void setDisplayDays(boolean displayDays) {
-        this.displayDays = displayDays;
-        daysPicker.setVisibility(displayDays ? VISIBLE : GONE);
-        checkSettings();
-    }
-    public void setDisplayMonthNumbers(boolean displayMonthNumbers) {
-        this.monthPicker.setDisplayMonthNumbers(displayMonthNumbers);
-        this.monthPicker.updateAdapter();
-    }
-
-    public void setMonthFormat(String monthFormat) {
-        this.monthPicker.setMonthFormat(monthFormat);
-        this.monthPicker.updateAdapter();
-    }
-
-    public void setTodayText(DateWithLabel todayText) {
-        if (todayText != null && todayText.label != null && !todayText.label.isEmpty()) {
-            daysPicker.setTodayText(todayText);
-        }
-    }
-
-    public void setItemSpacing(int size) {
-        for (WheelPicker picker : pickers) {
-            picker.setItemSpace(size);
-        }
-    }
-
-    public void setCurvedMaxAngle(int angle) {
-        for (WheelPicker picker : pickers) {
-            picker.setCurvedMaxAngle(angle);
-        }
-    }
-
-    public void setCurved(boolean curved) {
-        for (WheelPicker picker : pickers) {
-            picker.setCurved(curved);
-        }
-    }
-
-    public void setCyclic(boolean cyclic) {
-        for (WheelPicker picker : pickers) {
-            picker.setCyclic(cyclic);
-        }
-    }
-
-    public void setTextSize(int textSize) {
-        for (WheelPicker picker : pickers) {
-            picker.setItemTextSize(textSize);
-        }
-    }
-
-    public void setSelectedTextColor(int selectedTextColor) {
-        for (WheelPicker picker : pickers) {
-            picker.setSelectedItemTextColor(selectedTextColor);
-        }
-    }
-
-    public void setTextColor(int textColor) {
-        for (WheelPicker picker : pickers) {
-            picker.setItemTextColor(textColor);
-        }
-    }
-
-    public void setTextAlign(int align) {
-        for (WheelPicker picker : pickers) {
-            picker.setItemAlign(align);
-        }
-    }
-
-    public void setTypeface(Typeface typeface) {
-        if(typeface == null) return;
-        for (WheelPicker picker : pickers) {
-            picker.setTypeface(typeface);
-        }
-    }
-
-    private void setFontToAllPickers(int resourceId) {
-        if (resourceId > 0) {
-            for (int i = 0; i< pickers.size();i++) {
-                pickers.get(i).setTypeface(ResourcesCompat.getFont(getContext(), resourceId));
-            }
-        }
-    }
-
-    public void setSelectorColor(int selectorColor) {
-        dtSelector.setBackgroundColor(selectorColor);
-    }
-
-    public void setSelectorHeight(int selectorHeight) {
-        final ViewGroup.LayoutParams dtSelectorLayoutParams = dtSelector.getLayoutParams();
-        dtSelectorLayoutParams.height = selectorHeight;
-        dtSelector.setLayoutParams(dtSelectorLayoutParams);
-    }
-
-    public void setVisibleItemCount(int visibleItemCount) {
-        for (WheelPicker picker : pickers) {
-            picker.setVisibleItemCount(visibleItemCount);
-        }
-    }
-    public void setDayFormatter(SimpleDateFormat simpleDateFormat) {
-        if (simpleDateFormat != null) {
-            this.daysPicker.setDayFormatter(simpleDateFormat);
-        }
-    }
-
-    public void setMinDate(Date minDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(dateHelper.getTimeZone());
-        calendar.setTime(minDate);
-        this.minDate = calendar.getTime();
-        setMinYear();
-    }
-
-    public void setMaxDate(Date maxDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(dateHelper.getTimeZone());
-        calendar.setTime(maxDate);
-        this.maxDate = calendar.getTime();
-        setMinYear();
-    }
-
-    public void setCustomLocale(Locale locale) {
-        for (WheelPicker p : pickers) {
-            p.setCustomLocale(locale);
-            p.updateAdapter();
-        }
-    }
-
-    private void checkMinMaxDate(final WheelPicker picker) {
-        checkBeforeMinDate(picker);
-        checkAfterMaxDate(picker);
-    }
-
-    private void checkBeforeMinDate(final WheelPicker picker) {
-        picker.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (minDate != null && isBeforeMinDate(getDate())) {
-                    for (WheelPicker p : pickers) {
-                        p.scrollTo(p.findIndexOfDate(minDate));
-                    }
-                }
-            }
-        }, DELAY_BEFORE_CHECK_PAST);
-    }
-
-    private void checkAfterMaxDate(final WheelPicker picker) {
-        picker.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (maxDate != null && isAfterMaxDate(getDate())) {
-                    for (WheelPicker p : pickers) {
-                        p.scrollTo(p.findIndexOfDate(maxDate));
-                    }
-                }
-            }
-        }, DELAY_BEFORE_CHECK_PAST);
-    }
-
-    private boolean isBeforeMinDate(Date date) {
-        return dateHelper.getCalendarOfDate(date).before(dateHelper.getCalendarOfDate(minDate));
-    }
-
-    private boolean isAfterMaxDate(Date date) {
-        return dateHelper.getCalendarOfDate(date).after(dateHelper.getCalendarOfDate(maxDate));
-    }
-
-    public Date getDate() {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(dateHelper.getTimeZone());
-        if (displayDays) {
-            final Date dayDate = daysPicker.getCurrentDate();
-            calendar.setTime(dayDate);
-        } else {
-            if (displayMonth) {
-                calendar.set(Calendar.MONTH, monthPicker.getCurrentMonth());
-            }
-
-            if (displayYears) {
-                calendar.set(Calendar.YEAR, yearsPicker.getCurrentYear());
-            }
-
-            if (displayDaysOfMonth) {
-                int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-                if (daysOfMonthPicker.getCurrentDay() >= daysInMonth) {
-                    calendar.set(Calendar.DAY_OF_MONTH, daysInMonth);
-                } else {
-                    calendar.set(Calendar.DAY_OF_MONTH, daysOfMonthPicker.getCurrentDay() + 1);
-                }
-            }
-        }
-        return calendar.getTime();
-    }
-    public void setDefaultDate(Date date) {
-        if (date != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeZone(dateHelper.getTimeZone());
-            calendar.setTime(date);
-            this.defaultDate = calendar.getTime();
-            
-            updateDaysOfMonth(calendar);
-
-            for (WheelPicker picker : pickers) {
-                picker.setDefaultDate(defaultDate);
-            }
-        }
-    }
-
-    private void updateDaysOfMonth() {
-        final Date date = getDate();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(dateHelper.getTimeZone());
-        calendar.setTime(date);
-        updateDaysOfMonth(calendar);
-    }
-
-    private void updateDaysOfMonth(@NonNull Calendar calendar) {
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        daysOfMonthPicker.setDaysInMonth(daysInMonth);
-        daysOfMonthPicker.updateAdapter();
-    }
-
-    public void setMustBeOnFuture(boolean mustBeOnFuture) {
-        this.mustBeOnFuture = mustBeOnFuture;
-        daysPicker.setShowOnlyFutureDate(mustBeOnFuture);
-        if (mustBeOnFuture) {
-            Calendar now = Calendar.getInstance();
-            now.setTimeZone(dateHelper.getTimeZone());
-            minDate = now.getTime(); //minDate is Today
-        }
-    }
-
-    private void setMinYear() {
-
-        if (displayYears && this.minDate != null && this.maxDate != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeZone(dateHelper.getTimeZone());
-            calendar.setTime(this.minDate);
-            yearsPicker.setMinYear(calendar.get(Calendar.YEAR));
-            calendar.setTime(this.maxDate);
-            yearsPicker.setMaxYear(calendar.get(Calendar.YEAR));
-        }
-    }
-
-    private void checkSettings() {
-        if (displayDays && (displayDaysOfMonth || displayMonth)) {
-            throw new IllegalArgumentException("You can either display days with months or days and months separately");
-        }
-    }
-
-    private void init(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SingleDatePicker);
-
-        final Resources resources = getResources();
-        setTodayText(new DateWithLabel(a.getString(R.styleable.SingleDatePicker_picker_todayText), new Date()));
-        setTextColor(a.getColor(R.styleable.SingleDatePicker_picker_textColor, ContextCompat.getColor(context, R.color.gray_200)));
-        setSelectedTextColor(a.getColor(R.styleable.SingleDatePicker_picker_selectedTextColor, ContextCompat.getColor(context, R.color.black)));
-        setSelectorColor(a.getColor(R.styleable.SingleDatePicker_picker_selectorColor, ContextCompat.getColor(context, R.color.gray_300)));
-        setItemSpacing(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_itemSpacing, resources.getDimensionPixelSize(R.dimen.wheelSelectorHeight)));
-        setCurvedMaxAngle(a.getInteger(R.styleable.SingleDatePicker_picker_curvedMaxAngle, WheelPicker.MAX_ANGLE));
-        setSelectorHeight(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_selectorHeight, resources.getDimensionPixelSize(R.dimen.wheelSelectorHeight)));
-        setTextSize(a.getDimensionPixelSize(R.styleable.SingleDatePicker_picker_textSize, resources.getDimensionPixelSize(R.dimen.WheelItemTextSize)));
-        setCurved(a.getBoolean(R.styleable.SingleDatePicker_picker_curved, IS_CURVED_DEFAULT));
-        setCyclic(a.getBoolean(R.styleable.SingleDatePicker_picker_cyclic, IS_CYCLIC_DEFAULT));
-        setMustBeOnFuture(a.getBoolean(R.styleable.SingleDatePicker_picker_mustBeOnFuture, MUST_BE_ON_FUTURE_DEFAULT));
-        setVisibleItemCount(a.getInt(R.styleable.SingleDatePicker_picker_visibleItemCount, VISIBLE_ITEM_COUNT_DEFAULT));
-
-        daysPicker.setDayCount(a.getInt(R.styleable.SingleDatePicker_picker_dayCount, DAYS_PADDING));
-        setDisplayDays(a.getBoolean(R.styleable.SingleDatePicker_picker_displayDays, displayDays));
-        setDisplayMonths(a.getBoolean(R.styleable.SingleDatePicker_picker_displayMonth, displayMonth));
-        setDisplayYears(a.getBoolean(R.styleable.SingleDatePicker_picker_displayYears, displayYears));
-        setDisplayDaysOfMonth(a.getBoolean(R.styleable.SingleDatePicker_picker_displayDaysOfMonth, displayDaysOfMonth));
-        setDisplayMonthNumbers(a.getBoolean(R.styleable.SingleDatePicker_picker_displayMonthNumbers, monthPicker.displayMonthNumbers()));
-        setFontToAllPickers(a.getResourceId(R.styleable.SingleDatePicker_fontFamily,0));
-        String monthFormat = a.getString(R.styleable.SingleDatePicker_picker_monthFormat);
-        setMonthFormat(TextUtils.isEmpty(monthFormat) ? WheelMonthPicker.MONTH_FORMAT : monthFormat);
-        setTextAlign(a.getInt(R.styleable.SingleDatePicker_picker_textAlign, ALIGN_CENTER));
-
-        checkSettings();
-        setMinYear();
-
-        a.recycle();
-        if (displayDaysOfMonth) {
-            Calendar now = Calendar.getInstance();
-            now.setTimeZone(dateHelper.getTimeZone());
-            updateDaysOfMonth(now);
-        }
-        daysPicker.updateAdapter(); // For MustBeFuture and dayCount
-    }
-
-    public interface OnDateChangedListener {
-        void onDateChanged(String displayed, Date date);
+        init(context, attrs)
     }
 }
