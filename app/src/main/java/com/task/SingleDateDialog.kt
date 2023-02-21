@@ -1,541 +1,446 @@
-package com.task;
+package com.task
 
-import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.content.Context
+import android.view.View
+import android.widget.TextView
+import androidx.annotation.ColorInt
+import com.task.libraries.*
+import java.text.SimpleDateFormat
+import java.util.*
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.task.libraries.BaseDialog;
-import com.task.libraries.BottomSheetHelper;
-import com.task.libraries.DateHelper;
-import com.task.libraries.SingleDatePicker;
-import com.task.libraries.DateWithLabel;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
-public class SingleDateDialog extends BaseDialog {
-
-    private final DateHelper dateHelper = new DateHelper();
-    private Listener listener;
-    private BottomSheetHelper bottomSheetHelper;
-    private SingleDatePicker picker;
-
-    @Nullable
-    private String title;
-    @Nullable
-    private Integer titleTextSize;
-    @Nullable
-    private Integer bottomSheetHeight;
-    @Nullable
-    private String todayText;
-    @Nullable
-    private DisplayListener displayListener;
-
-    private SingleDateDialog(Context context) {
-        this(context, false);
-    }
-
-    private SingleDateDialog(Context context, boolean bottomSheet) {
-        final int layout = R.layout.custom_date_picker;
-        this.bottomSheetHelper = new BottomSheetHelper(context, layout);
-
-        this.bottomSheetHelper.setListener(new BottomSheetHelper.Listener() {
-            @Override
-            public void onOpen() {
-            }
-
-            @Override
-            public void onLoaded(View view) {
-                init(view);
-                if (displayListener != null) {
-                    displayListener.onDisplayed(picker);
-                }
-            }
-            @Override
-            public void onClose() {
-                SingleDateDialog.this.onClose();
-
-                if (displayListener != null) {
-                    displayListener.onClosed(picker);
-                }
-            }
-        });
-    }
-
-
-    private void init(View view) {
-        picker = (SingleDatePicker) view.findViewById(R.id.picker);
-        picker.setDateHelper(dateHelper);
+class SingleDateDialog private constructor(context: Context, bottomSheet: Boolean = false) : BaseDialog() {
+    private val dateHelper = DateHelper()
+    private var listener: Listener? = null
+    private val bottomSheetHelper: BottomSheetHelper
+    private var picker: SingleDatePicker? = null
+    private var title: String? = null
+    private var titleTextSize: Int? = null
+    private var bottomSheetHeight: Int? = null
+    private var todayText: String? = null
+    private var displayListener: DisplayListener? = null
+    private fun init(view: View) {
+        picker = view.findViewById<View>(R.id.picker) as SingleDatePicker
+        picker!!.setDateHelper(dateHelper)
         if (picker != null) {
             if (bottomSheetHeight != null) {
-                ViewGroup.LayoutParams params = picker.getLayoutParams();
-                params.height = bottomSheetHeight;
-                picker.setLayoutParams(params);
+                val params = picker!!.layoutParams
+                params.height = bottomSheetHeight as Int
+                picker!!.layoutParams = params
             }
         }
-
-        final TextView buttonOk = (TextView) view.findViewById(R.id.tvApply);
+        val buttonOk = view.findViewById<View>(R.id.tvApply) as TextView
         if (buttonOk != null) {
-            buttonOk.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    okClicked = true;
-                    close();
-                }
-            });
-
+            buttonOk.setOnClickListener {
+                okClicked = true
+                close()
+            }
             if (mainColor != null) {
-                buttonOk.setTextColor(buttonColor);
+                buttonOk.setTextColor(buttonColor!!)
             }
-
             if (titleTextSize != null) {
-                buttonOk.setTextSize(titleTextSize);
+                buttonOk.textSize = titleTextSize!!.toFloat()
             }
         }
-
-        final View sheetContentLayout = view.findViewById(R.id.sheetContentLayout);
+        val sheetContentLayout = view.findViewById<View>(R.id.sheetContentLayout)
         if (sheetContentLayout != null) {
-            sheetContentLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
-
+            sheetContentLayout.setOnClickListener { }
             if (backgroundColor != null) {
-                sheetContentLayout.setBackgroundColor(backgroundColor);
+                sheetContentLayout.setBackgroundColor(backgroundColor!!)
             }
         }
-
-        final TextView titleTextView = (TextView) view.findViewById(R.id.sheetTitle);
+        val titleTextView = view.findViewById<View>(R.id.sheetTitle) as TextView
         if (titleTextView != null) {
-            titleTextView.setText("Choose date of birth");
-
+            titleTextView.text = "Choose date of birth"
             if (titleTextColor != null) {
-                titleTextView.setTextColor(titleTextColor);
+                titleTextView.setTextColor(titleTextColor!!)
             }
-
             if (titleTextSize != null) {
-                titleTextView.setTextSize(titleTextSize);
+                titleTextView.textSize = titleTextSize!!.toFloat()
             }
         }
-
-        picker.setTodayText(new DateWithLabel(todayText, new Date()));
-
+        picker!!.setTodayText(DateWithLabel(todayText, Date()))
         if (curved) {
-            picker.setCurved(true);
-            picker.setVisibleItemCount(7);
+            picker!!.setCurved(true)
+            picker!!.setVisibleItemCount(7)
         } else {
-            picker.setCurved(false);
-            picker.setVisibleItemCount(5);
+            picker!!.setCurved(false)
+            picker!!.setVisibleItemCount(5)
         }
-        picker.setMustBeOnFuture(mustBeOnFuture);
-
+        picker!!.setMustBeOnFuture(mustBeOnFuture)
         if (dayFormatter != null) {
-            picker.setDayFormatter(dayFormatter);
+            picker!!.setDayFormatter(dayFormatter)
         }
-
         if (customLocale != null) {
-            picker.setCustomLocale(customLocale);
+            picker!!.setCustomLocale(customLocale)
         }
-
         if (mainColor != null) {
-            picker.setSelectedTextColor(mainColor);
+            picker!!.setSelectedTextColor(mainColor!!)
         }
 
         // displayYears used in setMinDate / setMaxDate
-        picker.setDisplayYears(displayYears);
-
+        picker!!.setDisplayYears(displayYears)
         if (minDate != null) {
-            picker.setMinDate(minDate);
+            picker!!.setMinDate(minDate)
         }
-
         if (maxDate != null) {
-            picker.setMaxDate(maxDate);
+            picker!!.setMaxDate(maxDate)
         }
-
         if (defaultDate != null) {
-            picker.setDefaultDate(defaultDate);
+            picker!!.setDefaultDate(defaultDate)
         }
-        picker.setDisplayDays(displayDays);
-        picker.setDisplayMonths(displayMonth);
-        picker.setDisplayDaysOfMonth(displayDaysOfMonth);
+        picker!!.setDisplayDays(displayDays)
+        picker!!.setDisplayMonths(displayMonth)
+        picker!!.setDisplayDaysOfMonth(displayDaysOfMonth)
     }
 
-    public SingleDateDialog setListener(Listener listener) {
-        this.listener = listener;
-        return this;
+    fun setListener(listener: Listener?): SingleDateDialog {
+        this.listener = listener
+        return this
     }
 
-    public SingleDateDialog setCurved(boolean curved) {
-        this.curved = curved;
-        return this;
+    fun setCurved(curved: Boolean): SingleDateDialog {
+        this.curved = curved
+        return this
     }
 
-    private void setDisplayListener(DisplayListener displayListener) {
-        this.displayListener = displayListener;
+    private fun setDisplayListener(displayListener: DisplayListener) {
+        this.displayListener = displayListener
     }
 
-    public SingleDateDialog setTitle(@Nullable String title) {
-        this.title = title;
-        return this;
+    fun setTitle(title: String?): SingleDateDialog {
+        this.title = title
+        return this
     }
 
-    public SingleDateDialog setTitleTextSize(@Nullable Integer titleTextSize) {
-        this.titleTextSize = titleTextSize;
-        return this;
+    fun setTitleTextSize(titleTextSize: Int?): SingleDateDialog {
+        this.titleTextSize = titleTextSize
+        return this
     }
 
-    public SingleDateDialog setBottomSheetHeight(@Nullable Integer bottomSheetHeight) {
-        this.bottomSheetHeight = bottomSheetHeight;
-        return this;
+    fun setBottomSheetHeight(bottomSheetHeight: Int?): SingleDateDialog {
+        this.bottomSheetHeight = bottomSheetHeight
+        return this
     }
 
-    public SingleDateDialog setTodayText(@Nullable String todayText) {
-        this.todayText = todayText;
-        return this;
+    fun setTodayText(todayText: String?): SingleDateDialog {
+        this.todayText = todayText
+        return this
     }
 
-    public SingleDateDialog setMustBeOnFuture(boolean mustBeOnFuture) {
-        this.mustBeOnFuture = mustBeOnFuture;
-        return this;
+    fun setMustBeOnFuture(mustBeOnFuture: Boolean): SingleDateDialog {
+        this.mustBeOnFuture = mustBeOnFuture
+        return this
     }
 
-    public SingleDateDialog setMinDateRange(Date minDate) {
-        this.minDate = minDate;
-        return this;
+    fun setMinDateRange(minDate: Date?): SingleDateDialog {
+        this.minDate = minDate
+        return this
     }
 
-    public SingleDateDialog setMaxDateRange(Date maxDate) {
-        this.maxDate = maxDate;
-        return this;
+    fun setMaxDateRange(maxDate: Date?): SingleDateDialog {
+        this.maxDate = maxDate
+        return this
     }
 
-    public SingleDateDialog setDefaultDate(Date defaultDate) {
-        this.defaultDate = defaultDate;
-        return this;
+    fun setDefaultDate(defaultDate: Date?): SingleDateDialog {
+        this.defaultDate = defaultDate
+        return this
     }
 
-    public SingleDateDialog setDisplayDays(boolean displayDays) {
-        this.displayDays = displayDays;
-        return this;
+    fun setDisplayDays(displayDays: Boolean): SingleDateDialog {
+        this.displayDays = displayDays
+        return this
     }
 
-    public SingleDateDialog setDisplayMonthNumbers(boolean displayMonthNumbers) {
-        this.displayMonthNumbers = displayMonthNumbers;
-        return this;
+    fun setDisplayMonthNumbers(displayMonthNumbers: Boolean): SingleDateDialog {
+        this.displayMonthNumbers = displayMonthNumbers
+        return this
     }
 
-    public SingleDateDialog setDisplayDaysOfMonth(boolean displayDaysOfMonth) {
-        this.displayDaysOfMonth = displayDaysOfMonth;
-        return this;
+    fun setDisplayDaysOfMonth(displayDaysOfMonth: Boolean): SingleDateDialog {
+        this.displayDaysOfMonth = displayDaysOfMonth
+        return this
     }
 
-
-    private SingleDateDialog setDisplayMonth(boolean displayMonth) {
-        this.displayMonth = displayMonth;
-        return this;
+    private fun setDisplayMonth(displayMonth: Boolean): SingleDateDialog {
+        this.displayMonth = displayMonth
+        return this
     }
 
-    private SingleDateDialog setDisplayYears(boolean displayYears) {
-        this.displayYears = displayYears;
-        return this;
+    private fun setDisplayYears(displayYears: Boolean): SingleDateDialog {
+        this.displayYears = displayYears
+        return this
     }
 
-    public SingleDateDialog setDayFormatter(SimpleDateFormat dayFormatter) {
-        this.dayFormatter = dayFormatter;
-        return this;
-    }
-    public SingleDateDialog setFocusable(boolean focusable) {
-        bottomSheetHelper.setFocusable(focusable);
-        return this;
+    fun setDayFormatter(dayFormatter: SimpleDateFormat?): SingleDateDialog {
+        this.dayFormatter = dayFormatter
+        return this
     }
 
-    public SingleDateDialog setCustomLocale(Locale locale) {
-        this.customLocale = locale;
-        return this;
-    }
-    private SingleDateDialog setTimeZone(TimeZone timeZone) {
-        dateHelper.setTimeZone(timeZone);
-        return this;
+    fun setFocusable(focusable: Boolean): SingleDateDialog {
+        bottomSheetHelper.setFocusable(focusable)
+        return this
     }
 
-    @Override
-    public void display() {
-        super.display();
-        bottomSheetHelper.display();
+    fun setCustomLocale(locale: Locale?): SingleDateDialog {
+        customLocale = locale
+        return this
     }
 
-    @Override
-    public void close() {
-        super.close();
-        bottomSheetHelper.hide();
+    private fun setTimeZone(timeZone: TimeZone?): SingleDateDialog {
+        dateHelper.setTimeZone(timeZone)
+        return this
+    }
 
+    override fun display() {
+        super.display()
+        bottomSheetHelper.display()
+    }
+
+    override fun close() {
+        super.close()
+        bottomSheetHelper.hide()
         if (listener != null && okClicked) {
-            listener.onDateSelected(picker.getDate());
+            listener!!.onDateSelected(picker!!.date)
         }
     }
 
-    @Override
-    public void dismiss() {
-        super.dismiss();
-        bottomSheetHelper.dismiss();
+    override fun dismiss() {
+        super.dismiss()
+        bottomSheetHelper.dismiss()
     }
 
-    public interface Listener {
-        void onDateSelected(Date date);
-    }
-    public interface DisplayListener {
-        void onDisplayed(SingleDatePicker picker);
-        void onClosed(SingleDatePicker picker);
+    interface Listener {
+        fun onDateSelected(date: Date?)
     }
 
-    public static class Builder {
-        private final Context context;
-        private SingleDateDialog dialog;
+    interface DisplayListener {
+        fun onDisplayed(picker: SingleDatePicker?)
+        fun onClosed(picker: SingleDatePicker?)
+    }
 
-        @Nullable
-        private Listener listener;
-        @Nullable
-        private DisplayListener displayListener;
-
-        @Nullable
-        private String title;
-
-        @Nullable
-        private Integer titleTextSize;
-
-        @Nullable
-        private Integer bottomSheetHeight;
-
-        @Nullable
-        private String todayText;
-
-        private boolean bottomSheet;
-
-        private boolean curved;
-        private boolean mustBeOnFuture;
-
-        private boolean displayDays = true;
-        private boolean displayMonth = false;
-        private boolean displayDaysOfMonth = false;
-        private boolean displayYears = false;
-        private boolean displayMonthNumbers = false;
-        private boolean focusable = false;
+    class Builder(private val context: Context) {
+        private var dialog: SingleDateDialog? = null
+        private var listener: Listener? = null
+        private var displayListener: DisplayListener? = null
+        private var title: String? = null
+        private var titleTextSize: Int? = null
+        private var bottomSheetHeight: Int? = null
+        private var todayText: String? = null
+        private var bottomSheet = false
+        private var curved = false
+        private var mustBeOnFuture = false
+        private var displayDays = true
+        private var displayMonth = false
+        private var displayDaysOfMonth = false
+        private var displayYears = false
+        private var displayMonthNumbers = false
+        private var focusable = false
 
         @ColorInt
-        @Nullable
-        private Integer backgroundColor = null;
+        private var backgroundColor: Int? = null
 
         @ColorInt
-        @Nullable
-        private Integer mainColor = null;
+        private var mainColor: Int? = null
 
         @ColorInt
-        @Nullable
-        private Integer titleTextColor = null;
-
-        @Nullable
-        private Date minDate;
-        @Nullable
-        private Date maxDate;
-        @Nullable
-        private Date defaultDate;
-
-        @Nullable
-        private SimpleDateFormat dayFormatter;
-
-        @Nullable
-        private Locale customLocale;
-        private TimeZone timeZone;
-
-        public Builder(Context context) {
-            this.context = context;
+        private var titleTextColor: Int? = null
+        private var minDate: Date? = null
+        private var maxDate: Date? = null
+        private var defaultDate: Date? = null
+        private var dayFormatter: SimpleDateFormat? = null
+        private var customLocale: Locale? = null
+        private var timeZone: TimeZone? = null
+        fun title(title: String?): Builder {
+            this.title = title
+            return this
         }
 
-        public Builder title(@Nullable String title) {
-            this.title = title;
-            return this;
+        fun titleTextSize(titleTextSize: Int?): Builder {
+            this.titleTextSize = titleTextSize
+            return this
         }
 
-        public Builder titleTextSize(@Nullable Integer titleTextSize) {
-            this.titleTextSize = titleTextSize;
-            return this;
+        fun bottomSheetHeight(bottomSheetHeight: Int?): Builder {
+            this.bottomSheetHeight = bottomSheetHeight
+            return this
         }
 
-        public Builder bottomSheetHeight(@Nullable Integer bottomSheetHeight) {
-            this.bottomSheetHeight = bottomSheetHeight;
-            return this;
+        fun todayText(todayText: String?): Builder {
+            this.todayText = todayText
+            return this
         }
 
-        public Builder todayText(@Nullable String todayText) {
-            this.todayText = todayText;
-            return this;
+        fun bottomSheet(): Builder {
+            bottomSheet = true
+            return this
         }
 
-        public Builder bottomSheet() {
-            this.bottomSheet = true;
-            return this;
+        fun curved(): Builder {
+            curved = true
+            return this
         }
 
-        public Builder curved() {
-            this.curved = true;
-            return this;
+        fun mustBeOnFuture(): Builder {
+            mustBeOnFuture = true
+            return this
         }
 
-        public Builder mustBeOnFuture() {
-            this.mustBeOnFuture = true;
-            return this;
+        fun displayDays(displayDays: Boolean): Builder {
+            this.displayDays = displayDays
+            return this
         }
 
-        public Builder displayDays(boolean displayDays) {
-            this.displayDays = displayDays;
-            return this;
+        fun displayDaysOfMonth(displayDaysOfMonth: Boolean): Builder {
+            this.displayDaysOfMonth = displayDaysOfMonth
+            return this
         }
 
-        public Builder displayDaysOfMonth(boolean displayDaysOfMonth) {
-            this.displayDaysOfMonth = displayDaysOfMonth;
-            return this;
+        fun displayMonth(displayMonth: Boolean): Builder {
+            this.displayMonth = displayMonth
+            return this
         }
 
-        public Builder displayMonth(boolean displayMonth) {
-            this.displayMonth = displayMonth;
-            return this;
+        fun displayYears(displayYears: Boolean): Builder {
+            this.displayYears = displayYears
+            return this
         }
 
-        public Builder displayYears(boolean displayYears) {
-            this.displayYears = displayYears;
-            return this;
+        fun listener(listener: Listener?): Builder {
+            this.listener = listener
+            return this
         }
 
-        public Builder listener(@Nullable Listener listener) {
-            this.listener = listener;
-            return this;
+        fun displayListener(displayListener: DisplayListener?): Builder {
+            this.displayListener = displayListener
+            return this
         }
 
-        public Builder displayListener(@Nullable DisplayListener displayListener) {
-            this.displayListener = displayListener;
-            return this;
+        fun titleTextColor(@ColorInt titleTextColor: Int): Builder {
+            this.titleTextColor = titleTextColor
+            return this
         }
 
-        public Builder titleTextColor(@NonNull @ColorInt int titleTextColor) {
-            this.titleTextColor = titleTextColor;
-            return this;
+        fun backgroundColor(@ColorInt backgroundColor: Int): Builder {
+            this.backgroundColor = backgroundColor
+            return this
         }
 
-        public Builder backgroundColor(@NonNull @ColorInt int backgroundColor) {
-            this.backgroundColor = backgroundColor;
-            return this;
+        fun mainColor(@ColorInt mainColor: Int): Builder {
+            this.mainColor = mainColor
+            return this
         }
 
-        public Builder mainColor(@NonNull @ColorInt int mainColor) {
-            this.mainColor = mainColor;
-            return this;
+        fun minDateRange(minDate: Date?): Builder {
+            this.minDate = minDate
+            return this
         }
 
-        public Builder minDateRange(Date minDate) {
-            this.minDate = minDate;
-            return this;
+        fun maxDateRange(maxDate: Date?): Builder {
+            this.maxDate = maxDate
+            return this
         }
 
-        public Builder maxDateRange(Date maxDate) {
-            this.maxDate = maxDate;
-            return this;
+        fun displayMonthNumbers(displayMonthNumbers: Boolean): Builder {
+            this.displayMonthNumbers = displayMonthNumbers
+            return this
         }
 
-        public Builder displayMonthNumbers(boolean displayMonthNumbers) {
-            this.displayMonthNumbers = displayMonthNumbers;
-            return this;
+        fun defaultDate(defaultDate: Date?): Builder {
+            this.defaultDate = defaultDate
+            return this
         }
 
-        public Builder defaultDate(Date defaultDate) {
-            this.defaultDate = defaultDate;
-            return this;
+        fun setDayFormatter(dayFormatter: SimpleDateFormat?): Builder {
+            this.dayFormatter = dayFormatter
+            return this
         }
 
-        public Builder setDayFormatter(SimpleDateFormat dayFormatter) {
-            this.dayFormatter = dayFormatter;
-            return this;
+        fun customLocale(locale: Locale?): Builder {
+            customLocale = locale
+            return this
         }
 
-        public Builder customLocale(Locale locale) {
-            this.customLocale = locale;
-            return this;
+        fun setTimeZone(timeZone: TimeZone?): Builder {
+            this.timeZone = timeZone
+            return this
         }
 
-        public Builder setTimeZone(TimeZone timeZone) {
-            this.timeZone = timeZone;
-            return this;
+        fun focusable(): Builder {
+            focusable = true
+            return this
         }
 
-        public Builder focusable() {
-            this.focusable = true;
-            return this;
-        }
-
-        public SingleDateDialog build() {
-            final SingleDateDialog dialog = new SingleDateDialog(context, bottomSheet)
-                    .setTitle(title)
-                    .setTitleTextSize(titleTextSize)
-                    .setBottomSheetHeight(bottomSheetHeight)
-                    .setTodayText(todayText)
-                    .setListener(listener)
-                    .setCurved(curved)
-                    .setMaxDateRange(maxDate)
-                    .setMinDateRange(minDate)
-                    .setDefaultDate(defaultDate)
-                    .setDisplayMonth(displayMonth)
-                    .setDisplayYears(displayYears)
-                    .setDisplayDaysOfMonth(displayDaysOfMonth)
-                    .setDisplayMonthNumbers(displayMonthNumbers)
-                    .setDisplayDays(displayDays)
-                    .setDayFormatter(dayFormatter)
-                    .setCustomLocale(customLocale)
-                    .setMustBeOnFuture(mustBeOnFuture)
-                    .setTimeZone(timeZone)
-                    .setFocusable(focusable);
-
+        fun build(): SingleDateDialog {
+            val dialog = SingleDateDialog(context, bottomSheet)
+                .setTitle(title)
+                .setTitleTextSize(titleTextSize)
+                .setBottomSheetHeight(bottomSheetHeight)
+                .setTodayText(todayText)
+                .setListener(listener)
+                .setCurved(curved)
+                .setMaxDateRange(maxDate)
+                .setMinDateRange(minDate)
+                .setDefaultDate(defaultDate)
+                .setDisplayMonth(displayMonth)
+                .setDisplayYears(displayYears)
+                .setDisplayDaysOfMonth(displayDaysOfMonth)
+                .setDisplayMonthNumbers(displayMonthNumbers)
+                .setDisplayDays(displayDays)
+                .setDayFormatter(dayFormatter)
+                .setCustomLocale(customLocale)
+                .setMustBeOnFuture(mustBeOnFuture)
+                .setTimeZone(timeZone)
+                .setFocusable(focusable)
             if (mainColor != null) {
-                dialog.setMainColor(mainColor);
+                dialog.setMainColor(mainColor)
             }
-
             if (backgroundColor != null) {
-                dialog.setBackgroundColor(backgroundColor);
+                dialog.setBackgroundColor(backgroundColor)
             }
-
             if (titleTextColor != null) {
-                dialog.setTitleTextColor(titleTextColor);
+                dialog.setTitleTextColor(titleTextColor!!)
             }
-
             if (displayListener != null) {
-                dialog.setDisplayListener(displayListener);
+                dialog.setDisplayListener(displayListener!!)
             }
-
-            return dialog;
+            return dialog
         }
 
-        public void display() {
-            dialog = build();
-            dialog.display();
+        fun display() {
+            dialog = build()
+            dialog!!.display()
         }
 
-        public void close() {
+        fun close() {
             if (dialog != null) {
-                dialog.close();
+                dialog!!.close()
             }
         }
 
-        public void dismiss() {
-            if (dialog != null)
-                dialog.dismiss();
+        fun dismiss() {
+            if (dialog != null) dialog!!.dismiss()
         }
     }
 
+    init {
+        val layout = R.layout.custom_date_picker
+        bottomSheetHelper = BottomSheetHelper(context, layout)
+        bottomSheetHelper.setListener(object : BottomSheetHelper.Listener {
+            override fun onOpen() {}
+            override fun onLoaded(view: View) {
+                init(view)
+                if (displayListener != null) {
+                    displayListener!!.onDisplayed(picker)
+                }
+            }
+
+            override fun onClose() {
+                this@SingleDateDialog.onClose()
+                if (displayListener != null) {
+                    displayListener!!.onClosed(picker)
+                }
+            }
+        })
+    }
 }
