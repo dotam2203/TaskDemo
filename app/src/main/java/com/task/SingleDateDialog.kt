@@ -28,18 +28,16 @@ class SingleDateDialog private constructor(context: Context, bottomSheet: Boolea
                 picker!!.layoutParams = params
             }
         }
-        val buttonOk = view.findViewById<View>(R.id.tvApply) as TextView
-        if (buttonOk != null) {
-            buttonOk.setOnClickListener {
-                okClicked = true
-                close()
-            }
-            if (mainColor != null) {
-                buttonOk.setTextColor(buttonColor!!)
-            }
-            if (titleTextSize != null) {
-                buttonOk.textSize = titleTextSize!!.toFloat()
-            }
+        val tvApply = view.findViewById<View>(R.id.tvApply) as TextView
+        tvApply.setOnClickListener {
+            okClicked = true
+            close()
+        }
+        if (mainColor != null) {
+            tvApply.setTextColor(buttonColor!!)
+        }
+        if (titleTextSize != null) {
+            tvApply.textSize = titleTextSize!!.toFloat()
         }
         val sheetContentLayout = view.findViewById<View>(R.id.sheetContentLayout)
         if (sheetContentLayout != null) {
@@ -430,8 +428,10 @@ class SingleDateDialog private constructor(context: Context, bottomSheet: Boolea
         bottomSheetHelper = BottomSheetHelper(context, layout)
         bottomSheetHelper.setListener(object : BottomSheetHelper.Listener {
             override fun onOpen() {}
-            override fun onLoaded(view: View) {
-                init(view)
+            override fun onLoaded(view: View?) {
+                if (view != null) {
+                    init(view)
+                }
                 if (displayListener != null) {
                     displayListener!!.onDisplayed(picker)
                 }
