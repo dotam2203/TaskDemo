@@ -1,164 +1,124 @@
-package com.task.libraries;
+package com.task.libraries
 
-import static com.task.libraries.SingleDateConstants.DAYS_PADDING;
+import android.content.Context
+import android.util.AttributeSet
+import com.task.R
+import java.text.SimpleDateFormat
+import java.util.*
 
-import android.content.Context;
-import android.util.AttributeSet;
+class WheelDayPicker(context: Context, attrs: AttributeSet) : WheelPicker<DateWithLabel?>(context, attrs) {
+    private var simpleDateFormat = SimpleDateFormat(DAY_FORMAT_PATTERN, currentLocale).apply {
+        timeZone = dateHelper.getTimeZone()
+    }
+    private var customDateFormat: SimpleDateFormat? = null
+    private var dayCount = SingleDateConstants.DAYS_PADDING
+    private var onDaySelectedListener: OnDaySelectedListener? = null
 
-import androidx.annotation.NonNull;
+    override fun init() {}
 
-import com.task.R;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-public class WheelDayPicker extends WheelPicker<DateWithLabel> {
-
-    private static final String DAY_FORMAT_PATTERN = "dd/MM/yyyy";
-
-    private SimpleDateFormat simpleDateFormat;
-    private SimpleDateFormat customDateFormat;
-    private int dayCount = DAYS_PADDING;
-
-    private OnDaySelectedListener onDaySelectedListener;
-
-    public WheelDayPicker(Context context) {
-        super(context);
+    override fun setCustomLocale(customLocale: Locale) {
+        super.setCustomLocale(customLocale)
     }
 
-    public WheelDayPicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    override fun initDefault(): DateWithLabel {
+        return DateWithLabel(todayText, Date())
     }
 
-    @Override
-    protected void init() {
-        simpleDateFormat = new SimpleDateFormat(DAY_FORMAT_PATTERN, getCurrentLocale());
-        simpleDateFormat.setTimeZone(dateHelper.getTimeZone());
+    //sử dụng get() lấy giá trị thay vì trả về
+    private val todayText: String
+    get() = getLocalizedString(R.string.picker_today)
+
+    fun setDayCount(dayCount: Int) {
+        this.dayCount = dayCount
     }
 
-    @Override
-    public void setCustomLocale(Locale customLocale) {
-        super.setCustomLocale(customLocale);
-        simpleDateFormat = new SimpleDateFormat(DAY_FORMAT_PATTERN, getCurrentLocale());
-        simpleDateFormat.setTimeZone(dateHelper.getTimeZone());
-    }
-
-    @Override
-    protected DateWithLabel initDefault() {
-        return new DateWithLabel(getTodayText(), new Date());
-    }
-
-    @NonNull
-    private String getTodayText() {
-        return getLocalizedString(R.string.picker_today);
-    }
-
-    @Override
-    protected void onItemSelected(int position, DateWithLabel item) {
-        if (onDaySelectedListener != null) {
-            onDaySelectedListener.onDaySelected(this, position, item.label, item.date);
-        }
-    }
-
-    public void setDayCount(int dayCount) {
-        this.dayCount = dayCount;
-    }
-
-    @Override
-    protected List<DateWithLabel> generateAdapterValues(boolean showOnlyFutureDates) {
-        final List<DateWithLabel> days = new ArrayList<>();
-
-        Calendar instance = Calendar.getInstance();
-        instance.setTimeZone(dateHelper.getTimeZone());
-        int startDayOffset = showOnlyFutureDates ? 0 : -1 * dayCount;
-        instance.add(Calendar.DATE, startDayOffset - 1);
-        for (int i = startDayOffset; i < 0; ++i) {
-            instance.add(Calendar.DAY_OF_MONTH, 1);
-            Date date = instance.getTime();
-            days.add(new DateWithLabel(getFormattedValue(date), date));
+    override fun generateAdapterValues(showOnlyFutureDates: Boolean): List<DateWithLabel> {
+        val days: MutableList<DateWithLabel> = ArrayList()
+        var instance = Calendar.getInstance()
+        instance.timeZone = dateHelper.getTimeZone()
+        val startDayOffset = if (showOnlyFutureDates) 0 else -1 * dayCount
+        instance.add(Calendar.DATE, startDayOffset - 1)
+        for (i in startDayOffset..-1) {
+            instance.add(Calendar.DAY_OF_MONTH, 1)
+            val date = instance.time
+            days.add(DateWithLabel(getFormattedValue(date), date))
         }
 
         //today
-        days.add(new DateWithLabel(getTodayText(), new Date()));
-
-        instance = Calendar.getInstance();
-        instance.setTimeZone(dateHelper.getTimeZone());
-
-        for (int i = 0; i < dayCount; ++i) {
-            instance.add(Calendar.DATE, 1);
-            Date date = instance.getTime();
-            days.add(new DateWithLabel(getFormattedValue(date), date));
+        days.add(DateWithLabel(todayText, Date()))
+        instance = Calendar.getInstance()
+        instance.timeZone = dateHelper.getTimeZone()
+        for (i in 0 until dayCount) {
+            instance.add(Calendar.DATE, 1)
+            val date = instance.time
+            days.add(DateWithLabel(getFormattedValue(date), date))
         }
-
-        return days;
+        return days
     }
 
-    protected String getFormattedValue(Object value) {
-        return getDateFormat().format(value);
+    override fun getFormattedValue(value: Any): String {
+        return dateFormat!!.format(value)
     }
 
-    public WheelDayPicker setDayFormatter(SimpleDateFormat simpleDateFormat) {
-        simpleDateFormat.setTimeZone(dateHelper.getTimeZone());
-        this.customDateFormat = simpleDateFormat;
-        updateAdapter();
-        return this;
+    fun setDayFormatter(simpleDateFormat: SimpleDateFormat): WheelDayPicker {
+        simpleDateFormat.timeZone = dateHelper.getTimeZone()
+        customDateFormat = simpleDateFormat
+        updateAdapter()
+        return this
     }
+    fun setOnDaySelectedListener(onDaySelectedListener: (picker: WheelDayPicker?, position: Int, name: String?, date: Date?) -> Unit){
+        this.onDaySelectedListener = object : OnDaySelectedListener{
+            override fun onDaySelected(picker: WheelDayPicker?, position: Int, name: String?, date: Date?) {
+                onDaySelectedListener(picker, position, name, date)
+            }
 
-    public void setOnDaySelectedListener(OnDaySelectedListener onDaySelectedListener) {
-        this.onDaySelectedListener = onDaySelectedListener;
-    }
-
-    public Date getCurrentDate() {
-        return convertItemToDate(super.getCurrentItemPosition());
-    }
-
-    private SimpleDateFormat getDateFormat() {
-        if (customDateFormat != null) {
-            return customDateFormat;
         }
-        return simpleDateFormat;
     }
+    val currentDate: Date
+        get() = convertItemToDate(super.getCurrentItemPosition())
+    private val dateFormat: SimpleDateFormat?
+        get() =  if (customDateFormat != null) {
+                    customDateFormat
+                }
+                else simpleDateFormat
 
-    private Date convertItemToDate(int itemPosition) {
-        Date date;
-        final String itemText = adapter.getItemText(itemPosition);
-        final Calendar todayCalendar = Calendar.getInstance();
-        todayCalendar.setTimeZone(dateHelper.getTimeZone());
-
-        int todayPosition = -1;
-        final List<DateWithLabel> data = adapter.getData();
-
-        for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).label.equals(getTodayText())) {
-                todayPosition = i;
-                break;
+    private fun convertItemToDate(itemPosition: Int): Date {
+        val date: Date
+        val itemText = adapter.getItemText(itemPosition)
+        val todayCalendar = Calendar.getInstance()
+        todayCalendar.timeZone = dateHelper.getTimeZone()
+        var todayPosition = -1
+        val data: List<DateWithLabel> = adapter.data as List<DateWithLabel>
+        for (i in data.indices) {
+            if (data[i].label == todayText) {
+                todayPosition = i
+                break
             }
         }
-
-        if (getTodayText().equals(itemText)) {
-            date = todayCalendar.getTime();
+        date = if (todayText == itemText) {
+            todayCalendar.time
         } else {
-            todayCalendar.add(Calendar.DAY_OF_YEAR, (itemPosition - todayPosition));
-            date = todayCalendar.getTime();
+            todayCalendar.add(Calendar.DAY_OF_YEAR, itemPosition - todayPosition)
+            todayCalendar.time
         }
-        return date;
+        return date
     }
 
-    public void setTodayText(DateWithLabel today) {
-        final List<DateWithLabel> data = adapter.getData();
-        for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).label.equals(getTodayText())) {
-                adapter.getData().set(i, today);
-                notifyDatasetChanged();
+    fun setTodayText(today: DateWithLabel?) {
+        val data: List<DateWithLabel> = adapter.data as List<DateWithLabel>
+        for (i in data.indices) {
+            if (data[i].label == todayText) {
+                adapter.data[i] = today
+                notifyDatasetChanged()
             }
         }
     }
 
-    public interface OnDaySelectedListener {
-        void onDaySelected(WheelDayPicker picker, int position, String name, Date date);
+    interface OnDaySelectedListener {
+        fun onDaySelected(picker: WheelDayPicker?, position: Int, name: String?, date: Date?)
+    }
+
+    companion object {
+        private const val DAY_FORMAT_PATTERN = "dd/MM/yyyy"
     }
 }

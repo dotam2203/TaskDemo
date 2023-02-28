@@ -38,28 +38,39 @@ class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: Attrib
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         yearsPicker.setOnYearSelectedListener { picker, position, year ->
-            checkMinMaxDate(picker)
+            if (picker != null) {
+                checkMinMaxDate(picker)
+            }
             if (displayDaysOfMonth) {
                 updateDaysOfMonth()
             }
         }
         monthPicker.setOnMonthSelectedListener { picker, monthIndex, monthName ->
-            checkMinMaxDate(picker)
+            if (picker != null) {
+                checkMinMaxDate(picker)
+            }
             if (displayDaysOfMonth) {
                 updateDaysOfMonth()
             }
         }
-        daysOfMonthPicker
-            .setDayOfMonthSelectedListener { picker, dayIndex -> checkMinMaxDate(picker) }
-        daysOfMonthPicker
-            .setOnFinishedLoopListener {
+        daysOfMonthPicker.apply {
+            setDayOfMonthSelectedListener { picker, dayIndex ->
+                if (picker != null) {
+                    checkMinMaxDate(picker)
+                }
+            }
+            setOnFinishedLoopListener {
                 if (displayMonth) {
                     monthPicker.scrollTo(monthPicker.currentItemPosition + 1)
                     updateDaysOfMonth()
                 }
             }
-        daysPicker
-            .setOnDaySelectedListener { picker, position, name, date -> checkMinMaxDate(picker) }
+        }
+        daysPicker.setOnDaySelectedListener{ picker, position, name, date ->
+            if (picker != null) {
+                checkMinMaxDate(picker)
+            }
+        }
         setDefaultDate(defaultDate) //update displayed date
     }
 
@@ -334,7 +345,7 @@ class SingleDatePicker @JvmOverloads constructor(context: Context, attrs: Attrib
     private fun init(context: Context, attrs: AttributeSet?) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.SingleDatePicker)
         val resources = resources
-        setTodayText(DateWithLabel(a.getString(R.styleable.SingleDatePicker_picker_todayText), Date()))
+        setTodayText(a.getString(R.styleable.SingleDatePicker_picker_todayText)?.let { DateWithLabel(it, Date()) })
         setTextColor(a.getColor(R.styleable.SingleDatePicker_picker_textColor, ContextCompat.getColor(context, R.color.gray_200)))
         setSelectedTextColor(a.getColor(R.styleable.SingleDatePicker_picker_selectedTextColor, ContextCompat.getColor(context, R.color.black)))
         setSelectorColor(a.getColor(R.styleable.SingleDatePicker_picker_selectorColor, ContextCompat.getColor(context, R.color.gray_300)))

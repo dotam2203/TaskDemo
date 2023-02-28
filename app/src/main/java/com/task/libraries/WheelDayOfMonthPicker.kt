@@ -1,84 +1,61 @@
-package com.task.libraries;
+package com.task.libraries
 
+import android.content.Context
+import android.util.AttributeSet
 
-import android.content.Context;
-import android.util.AttributeSet;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class WheelDayOfMonthPicker extends WheelPicker<String> {
-
-    private int daysInMonth;
-    private DayOfMonthSelectedListener listener;
-    private FinishedLoopListener finishedLoopListener;
-
-    public WheelDayOfMonthPicker(Context context) {
-        this(context, null);
-    }
-
-    public WheelDayOfMonthPicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    @Override
-    protected void init() {
+class WheelDayOfMonthPicker @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : WheelPicker<String?>(context, attrs) {
+    private var daysInMonth = 0
+    private var dayOfMonthSelected: DayOfMonthSelectedListener? = null
+    private var finishedLoopListener: FinishedLoopListener? = null
+    override fun init() {
         // no-op here
     }
 
-    @Override
-    protected List<String> generateAdapterValues(boolean showOnlyFutureDates) {
-        final List<String> dayList = new ArrayList<>();
-
-        for (int i = 1; i <= daysInMonth; i++) {
-            dayList.add(String.format("%02d", i));
+    override fun generateAdapterValues(showOnlyFutureDates: Boolean): List<String> {
+        val dayList: MutableList<String> = ArrayList()
+        for (i in 1..daysInMonth) {
+            dayList.add(String.format("%02d", i))
         }
-
-        return dayList;
+        return dayList
     }
 
+    override fun initDefault(): String = dateHelper.getDay(dateHelper.today()).toString()
 
-    @Override
-    protected String initDefault() {
-        return String.valueOf(dateHelper.getDay(dateHelper.today()));
+    fun setOnFinishedLoopListener(onFinishedLoop: (picker: WheelDayOfMonthPicker?) -> Unit) {
+        this.finishedLoopListener = object : FinishedLoopListener{
+            override fun onFinishedLoop(picker: WheelDayOfMonthPicker?) {
+                onFinishedLoop(picker)
+            }
+        }
     }
 
-    public void setOnFinishedLoopListener(FinishedLoopListener finishedLoopListener) {
-        this.finishedLoopListener = finishedLoopListener;
-    }
-
-    @Override
-    protected void onFinishedLoop() {
-        super.onFinishedLoop();
+    override fun onFinishedLoop() {
+        super.onFinishedLoop()
         if (finishedLoopListener != null) {
-            finishedLoopListener.onFinishedLoop(this);
+            finishedLoopListener!!.onFinishedLoop(this)
         }
     }
 
-    public void setDayOfMonthSelectedListener(DayOfMonthSelectedListener listener) {
-        this.listener = listener;
-    }
-
-    public void setDaysInMonth(int daysInMonth) {
-        this.daysInMonth = daysInMonth;
-    }
-
-    @Override
-    protected void onItemSelected(int position, String item) {
-        if (listener != null) {
-            listener.onDayOfMonthSelected(this, position);
+    fun setDayOfMonthSelectedListener(onDayOfMonthSelected: (picker: WheelDayOfMonthPicker?, dayIndex: Int) -> Unit) {
+        this.dayOfMonthSelected = object : DayOfMonthSelectedListener{
+            override fun onDayOfMonthSelected(picker: WheelDayOfMonthPicker?, dayIndex: Int) {
+                onDayOfMonthSelected(picker, dayIndex)
+            }
         }
     }
 
-    public int getCurrentDay() {
-        return getCurrentItemPosition();
+    fun setDaysInMonth(daysInMonth: Int) {
+        this.daysInMonth = daysInMonth
     }
 
-    public interface FinishedLoopListener {
-        void onFinishedLoop(WheelDayOfMonthPicker picker);
+    val currentDay: Int
+        get() = currentItemPosition
+
+    interface FinishedLoopListener {
+        fun onFinishedLoop(picker: WheelDayOfMonthPicker?)
     }
 
-    public interface DayOfMonthSelectedListener {
-        void onDayOfMonthSelected(WheelDayOfMonthPicker picker, int dayIndex);
+    interface DayOfMonthSelectedListener {
+        fun onDayOfMonthSelected(picker: WheelDayOfMonthPicker?, dayIndex: Int)
     }
 }

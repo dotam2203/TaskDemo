@@ -56,7 +56,7 @@ class SingleDateDialog private constructor(context: Context, bottomSheet: Boolea
                 titleTextView.textSize = titleTextSize!!.toFloat()
             }
         }
-        picker!!.setTodayText(DateWithLabel(todayText, Date()))
+        picker!!.setTodayText(todayText?.let { DateWithLabel(it, Date()) })
         if (curved) {
             picker!!.setCurved(true)
             picker!!.setVisibleItemCount(7)

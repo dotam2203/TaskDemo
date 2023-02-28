@@ -1,115 +1,65 @@
-package com.task.libraries;
+package com.task.libraries
 
-import android.content.Context;
-import android.text.TextUtils;
-import android.util.AttributeSet;
+import android.content.Context
+import android.text.TextUtils
+import android.util.AttributeSet
+import java.text.SimpleDateFormat
+import java.util.*
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-public class WheelMonthPicker extends WheelPicker<String> {
-
-    private int lastScrollPosition;
-
-    private MonthSelectedListener listener;
-
-    private boolean displayMonthNumbers = false;
-
-    public static final String MONTH_FORMAT = "MMMM";
-
-    private String monthFormat;
-
-    public WheelMonthPicker(Context context) {
-        this(context, null);
-    }
-
-    public WheelMonthPicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    @Override
-    protected void init() {
-
-    }
-
-    @Override
-    protected List<String> generateAdapterValues(boolean showOnlyFutureDates) {
-        final List<String> monthList = new ArrayList<>();
-
-        final SimpleDateFormat month_date = new SimpleDateFormat(getMonthFormat(), getCurrentLocale());
-        final Calendar cal = Calendar.getInstance(getCurrentLocale());
-        cal.setTimeZone(dateHelper.getTimeZone());
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-
-        for (int i = 0; i < 12; i++) {
-            cal.set(Calendar.MONTH, i);
+class WheelMonthPicker (context: Context?, attrs: AttributeSet?) : WheelPicker<String?>(context, attrs) {
+    private val lastScrollPosition = 0
+    private var onMonthSelected: MonthSelectedListener? = null
+    private var displayMonthNumbers = false
+    var monthFormat: String? = null
+        get() = if (TextUtils.isEmpty(field)) {
+            MONTH_FORMAT
+        } else {
+            field
+        }
+    override fun init() {}
+    override fun generateAdapterValues(showOnlyFutureDates: Boolean): List<String> {
+        val monthList: MutableList<String> = ArrayList()
+        val month_date = SimpleDateFormat(monthFormat, currentLocale)
+        val cal = Calendar.getInstance(currentLocale)
+        cal.timeZone = dateHelper.getTimeZone()
+        cal[Calendar.DAY_OF_MONTH] = 1
+        for (i in 0..11) {
+            cal[Calendar.MONTH] = i
             if (displayMonthNumbers) {
-                monthList.add(String.format("%02d", i + 1));
+                monthList.add(String.format("%02d", i + 1))
             } else {
-                monthList.add(month_date.format(cal.getTime()));
+                monthList.add(month_date.format(cal.time))
             }
         }
-
-        return monthList;
+        return monthList
     }
 
+    override fun initDefault(): String = dateHelper.getMonth(dateHelper.today()).toString()
 
-    @Override
-    protected String initDefault() {
-        return String.valueOf(dateHelper.getMonth(dateHelper.today()));
-    }
-
-    public void setOnMonthSelectedListener(MonthSelectedListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    protected void onItemSelected(int position, String item) {
-        if (listener != null) {
-            listener.onMonthSelected(this, position, item);
+    fun setOnMonthSelectedListener(onMonthSelected: (picker: WheelMonthPicker?, monthIndex: Int, monthName: String?) -> Unit) {
+        this.onMonthSelected = object : MonthSelectedListener{
+            override fun onMonthSelected(picker: WheelMonthPicker?, monthIndex: Int, monthName: String?) {
+                onMonthSelected(picker, monthIndex, monthName)
+            }
         }
     }
 
-    @Override
-    protected void onItemCurrentScroll(int position, String item) {
-        if (lastScrollPosition != position) {
-            onItemSelected(position, item);
-            lastScrollPosition = position;
-        }
+    fun displayMonthNumbers(): Boolean {
+        return displayMonthNumbers
     }
 
-    public boolean displayMonthNumbers() {
-        return displayMonthNumbers;
+    fun setDisplayMonthNumbers(displayMonthNumbers: Boolean) {
+        this.displayMonthNumbers = displayMonthNumbers
     }
 
-    public void setDisplayMonthNumbers(boolean displayMonthNumbers) {
-        this.displayMonthNumbers = displayMonthNumbers;
+    val currentMonth: Int
+        get() = currentItemPosition
+
+    interface MonthSelectedListener {
+        fun onMonthSelected(picker: WheelMonthPicker?, monthIndex: Int, monthName: String?)
     }
 
-    public int getCurrentMonth() {
-        return getCurrentItemPosition();
-    }
-
-    public interface MonthSelectedListener {
-        void onMonthSelected(WheelMonthPicker picker, int monthIndex, String monthName);
-    }
-
-    public void setMonthFormat(String format)
-    {
-        this.monthFormat = format;
-    }
-
-    public String getMonthFormat()
-    {
-       if(TextUtils.isEmpty(this.monthFormat))
-       {
-           return MONTH_FORMAT;
-       }
-       else
-       {
-           return this.monthFormat;
-       }
+    companion object {
+        const val MONTH_FORMAT = "MMMM"
     }
 }
