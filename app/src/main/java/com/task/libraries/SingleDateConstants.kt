@@ -1,7 +1,7 @@
-package com.task.libraries;
+package com.task.libraries
 
-public class SingleDateConstants {
-    public static final int DAYS_PADDING = 364;
-    public static final int MIN_YEAR_DIFF = 150;
-    public static final int MAX_YEAR_DIFF = 100;
+object SingleDateConstants {
+    const val DAYS_PADDING = 364
+    const val MIN_YEAR_DIFF = 150
+    const val MAX_YEAR_DIFF = 100
 }
