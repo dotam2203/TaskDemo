@@ -6,8 +6,7 @@ import android.util.AttributeSet
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WheelMonthPicker (context: Context?, attrs: AttributeSet?) : WheelPicker<String?>(context, attrs) {
-    private val lastScrollPosition = 0
+class WheelMonthPicker (context: Context, attrs: AttributeSet?) : WheelPicker<String?>(context, attrs) {
     private var onMonthSelected: MonthSelectedListener? = null
     private var displayMonthNumbers = false
     var monthFormat: String? = null

@@ -3,7 +3,7 @@ package com.task.libraries
 import android.content.Context
 import android.util.AttributeSet
 
-class WheelDayOfMonthPicker @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : WheelPicker<String?>(context, attrs) {
+class WheelDayOfMonthPicker @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : WheelPicker<String?>(context, attrs) {
     private var daysInMonth = 0
     private var dayOfMonthSelected: DayOfMonthSelectedListener? = null
     private var finishedLoopListener: FinishedLoopListener? = null

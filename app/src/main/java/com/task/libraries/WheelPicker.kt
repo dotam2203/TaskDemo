@@ -1,1011 +1,917 @@
-package com.task.libraries;
+package com.task.libraries
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Camera;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Region;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Handler;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.VelocityTracker;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.widget.Scroller;
+import android.animation.Animator
+import com.task.libraries.LocaleHelper.getString
+import kotlin.jvm.JvmOverloads
+import android.widget.Scroller
+import android.view.VelocityTracker
+import android.text.TextUtils
+import android.view.MotionEvent
+import android.os.Build
+import android.animation.ValueAnimator
+import android.animation.AnimatorListenerAdapter
+import com.task.R
+import androidx.annotation.StringRes
+import android.annotation.TargetApi
+import android.content.Context
+import android.graphics.*
+import android.os.Handler
+import android.os.Looper
+import android.util.AttributeSet
+import android.view.View
+import android.view.ViewConfiguration
+import java.lang.ArithmeticException
+import java.lang.NumberFormatException
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.abs
 
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-
-import com.task.R;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-public abstract class WheelPicker<V> extends View {
-
-    public static final int SCROLL_STATE_IDLE = 0;
-    public static final int SCROLL_STATE_DRAGGING = 1;
-    public static final int SCROLL_STATE_SCROLLING = 2;
-    public static final int ALIGN_CENTER = 0;
-    public static final int ALIGN_LEFT = 1;
-    public static final int ALIGN_RIGHT = 2;
-    public static final int MAX_ANGLE = 90;
-    protected final static String FORMAT = "%1$02d"; // two digits
-    protected DateHelper dateHelper = new DateHelper(); // Overwritten from Single..Picker
-    private final Handler handler = new Handler();
-    protected V defaultValue;
-    protected int lastScrollPosition;
-    protected Listener<WheelPicker, V> listener;
-    protected Adapter<V> adapter = new Adapter<>();
-    private Locale customLocale;
-    private Paint paint;
-    private Scroller scroller;
-    private VelocityTracker tracker;
-    private OnItemSelectedListener onItemSelectedListener;
-    private OnWheelChangeListener onWheelChangeListener;
-    private final Rect rectDrawn = new Rect();
-    private final Rect rectIndicatorHead = new Rect();
-    private final Rect rectIndicatorFoot = new Rect();
-    private final Rect rectCurrentItem = new Rect();
-    private final Camera camera = new Camera();
-    private final Matrix matrixRotate = new Matrix();
-    private final Matrix matrixDepth = new Matrix();
-    private String maxWidthText;
-
-    private int mVisibleItemCount, mDrawnItemCount;
-    private int mHalfDrawnItemCount;
-    private int mTextMaxWidth, mTextMaxHeight;
-    private int mItemTextColor, mSelectedItemTextColor;
-    private int mItemTextSize;
-    private int mIndicatorSize;
-    private int mIndicatorColor;
-    private int mCurtainColor;
-    private int mItemSpace;
-    private int mMaxAngle = MAX_ANGLE;
-    private int mItemAlign;
-    private int mItemHeight, mHalfItemHeight;
-    private int mHalfWheelHeight;
-    private int selectedItemPosition;
-    private int currentItemPosition;
-    private int minFlingY, maxFlingY;
-    private int minimumVelocity = 50, maximumVelocity = 8000;
-    private int wheelCenterX, wheelCenterY;
-    private int drawnCenterX, drawnCenterY;
-    private int scrollOffsetY;
-    private int textMaxWidthPosition;
-    private int lastPointY;
-    private int downPointY;
-    private int touchSlop = 8;
-
-    private boolean hasSameWidth;
-    private boolean hasIndicator;
-    private boolean hasCurtain;
-    private boolean hasAtmospheric;
-    private boolean isCyclic;
-    private boolean isCurved;
-    private boolean showOnlyFutureDate;
-
-    private boolean isClick;
-    private boolean isForceFinishScroll;
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (null == adapter) return;
-            final int itemCount = adapter.getItemCount();
-            if (itemCount == 0) return;
-            if (scroller.isFinished() && !isForceFinishScroll) {
-                if (mItemHeight == 0) return;
-                int position = (-scrollOffsetY / mItemHeight + selectedItemPosition) % itemCount;
-                position = position < 0 ? position + itemCount : position;
-                currentItemPosition = position;
-                onItemSelected();
+abstract class WheelPicker<V> @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+    protected var dateHelper = DateHelper() // Overwritten from Single..Picker
+    private val handler = Handler(Looper.getMainLooper())
+    protected var defaultValue: V
+    protected var lastScrollPosition = 0
+    protected var listener: Listener<WheelPicker<*>, V>? = null
+    protected var adapter: Adapter<V>? = Adapter()
+    private var customLocale: Locale? = null
+    private val paint: Paint?
+    private var scroller: Scroller? = null
+    private var tracker: VelocityTracker? = null
+    private val onItemSelectedListener: OnItemSelectedListener? = null
+    private val onWheelChangeListener: OnWheelChangeListener? = null
+    private val rectDrawn = Rect()
+    private val rectIndicatorHead = Rect()
+    private val rectIndicatorFoot = Rect()
+    private val rectCurrentItem = Rect()
+    private val camera = Camera()
+    private val matrixRotate = Matrix()
+    private val matrixDepth = Matrix()
+    private val maxWidthText: String?
+    private var mVisibleItemCount: Int
+    private var mDrawnItemCount = 0
+    private var mHalfDrawnItemCount = 0
+    private var mTextMaxWidth = 0
+    private var mTextMaxHeight = 0
+    private var mItemTextColor: Int
+    private var mSelectedItemTextColor: Int
+    private var mItemTextSize: Int
+    private val mIndicatorSize: Int
+    private val mIndicatorColor: Int
+    private val mCurtainColor: Int
+    private var mItemSpace: Int
+    private var mMaxAngle = MAX_ANGLE
+    private var mItemAlign: Int
+    private var mItemHeight = 0
+    private var mHalfItemHeight = 0
+    private var mHalfWheelHeight = 0
+    private var selectedItemPosition: Int = 0
+    var currentItemPosition: Int
+        private set
+    private var minFlingY = 0
+    private var maxFlingY = 0
+    private var minimumVelocity = 50
+    private var maximumVelocity = 8000
+    private var wheelCenterX = 0
+    private var wheelCenterY = 0
+    private var drawnCenterX = 0
+    private var drawnCenterY = 0
+    private var scrollOffsetY = 0
+    private val textMaxWidthPosition: Int
+    private var lastPointY = 0
+    private var downPointY = 0
+    private var touchSlop = 8
+    private val hasSameWidth: Boolean
+    private val hasIndicator: Boolean
+    private val hasCurtain: Boolean
+    private val hasAtmospheric: Boolean
+    private var isCyclic: Boolean
+    private var isCurved: Boolean
+    var showOnlyFutureDate = false
+    private var isClick = false
+    private var isForceFinishScroll = false
+    private val runnable: Runnable = object : Runnable {
+        override fun run() {
+            if (null == adapter) return
+            val itemCount = adapter!!.itemCount
+            if (itemCount == 0) return
+            if (scroller!!.isFinished && !isForceFinishScroll) {
+                if (mItemHeight == 0) return
+                var position = (-scrollOffsetY / mItemHeight + selectedItemPosition) % itemCount
+                position = if (position < 0) position + itemCount else position
+                currentItemPosition = position
+                onItemSelected()
                 if (null != onWheelChangeListener) {
-                    onWheelChangeListener.onWheelSelected(position);
-                    onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
+                    onWheelChangeListener.onWheelSelected(position)
+                    onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE)
                 }
             }
-            if (scroller.computeScrollOffset()) {
-                if (null != onWheelChangeListener) {
-                    onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
-                }
-
-                scrollOffsetY = scroller.getCurrY();
-
-                int position = (-scrollOffsetY / mItemHeight + selectedItemPosition) % itemCount;
-                if (onItemSelectedListener != null) {
-                    onItemSelectedListener.onCurrentItemOfScroll(WheelPicker.this, position);
-                }
-                onItemCurrentScroll(position, adapter.getItem(position));
-
-                postInvalidate();
-                handler.postDelayed(this, 16);
+            if (scroller!!.computeScrollOffset()) {
+                onWheelChangeListener?.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING)
+                scrollOffsetY = scroller!!.currY
+                val position = (-scrollOffsetY / mItemHeight + selectedItemPosition) % itemCount
+                onItemSelectedListener?.onCurrentItemOfScroll(this@WheelPicker, position)
+                adapter!!.getItem(position)?.let { onItemCurrentScroll(position, it) }
+                postInvalidate()
+                handler.postDelayed(this, 16)
             }
         }
-    };
-
-    public WheelPicker(Context context) {
-        this(context, null);
     }
 
-    public WheelPicker(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker);
-
-        mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size, getResources().getDimensionPixelSize(R.dimen.WheelItemTextSize));
-        mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7);
-        selectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
-        hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
-        textMaxWidthPosition = a.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1);
-        maxWidthText = a.getString(R.styleable.WheelPicker_wheel_maximum_width_text);
-        mSelectedItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_selected_item_text_color, -1);
-        mItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_item_text_color, 0xFF888888);
-        mItemSpace = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_space, getResources().getDimensionPixelSize(R.dimen.WheelItemSpace));
-        isCyclic = a.getBoolean(R.styleable.WheelPicker_wheel_cyclic, false);
-        hasIndicator = a.getBoolean(R.styleable.WheelPicker_wheel_indicator, false);
-        mIndicatorColor = a.getColor(R.styleable.WheelPicker_wheel_indicator_color, 0xFFEE3333);
-        mIndicatorSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_size, getResources().getDimensionPixelSize(R.dimen.WheelIndicatorSize));
-        hasCurtain = a.getBoolean(R.styleable.WheelPicker_wheel_curtain, false);
-        mCurtainColor = a.getColor(R.styleable.WheelPicker_wheel_curtain_color, 0x88FFFFFF);
-        hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
-        isCurved = a.getBoolean(R.styleable.WheelPicker_wheel_curved, false);
-        mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER);
-        a.recycle();
-
-        updateVisibleItemCount();
-
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.LINEAR_TEXT_FLAG);
-        paint.setTextSize(mItemTextSize);
-
-        scroller = new Scroller(getContext());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
-            ViewConfiguration conf = ViewConfiguration.get(getContext());
-            minimumVelocity = conf.getScaledMinimumFlingVelocity();
-            maximumVelocity = conf.getScaledMaximumFlingVelocity();
-            touchSlop = conf.getScaledTouchSlop();
-        }
-
-        init();
-        defaultValue = initDefault();
-        adapter.setData(generateAdapterValues(showOnlyFutureDate));
-        currentItemPosition = adapter.getItemPosition(defaultValue);
-        selectedItemPosition = currentItemPosition;
+    protected abstract fun init()
+    protected abstract fun initDefault(): V
+    fun updateAdapter() {
+        adapter!!.setData(generateAdapterValues(showOnlyFutureDate))
+        notifyDatasetChanged()
     }
 
-    protected abstract void init();
-
-    protected abstract V initDefault();
-
-    public void updateAdapter() {
-        adapter.setData(generateAdapterValues(showOnlyFutureDate));
-        notifyDatasetChanged();
+    protected abstract fun generateAdapterValues(showOnlyFutureDates: Boolean): List<V>?
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        setAdapter(adapter)
+        setDefault(defaultValue)
     }
 
-    protected abstract List<V> generateAdapterValues(boolean showOnlyFutureDates);
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        setAdapter(adapter);
-        setDefault(this.defaultValue);
-    }
-
-    private void updateVisibleItemCount() {
+    private fun updateVisibleItemCount() {
         if (mVisibleItemCount < 2) {
-            throw new ArithmeticException("Wheel's visible item count can not be less than 2!");
+            throw ArithmeticException("Wheel's visible item count can not be less than 2!")
         }
-
-        if (mVisibleItemCount % 2 == 0) mVisibleItemCount += 1;
-        mDrawnItemCount = mVisibleItemCount + 2;
-        mHalfDrawnItemCount = mDrawnItemCount / 2;
+        if (mVisibleItemCount % 2 == 0) mVisibleItemCount += 1
+        mDrawnItemCount = mVisibleItemCount + 2
+        mHalfDrawnItemCount = mDrawnItemCount / 2
     }
 
-    private void computeTextSize() {
-        mTextMaxWidth = mTextMaxHeight = 0;
+    private fun computeTextSize() {
+        mTextMaxHeight = 0
+        mTextMaxWidth = mTextMaxHeight
         if (hasSameWidth) {
-            mTextMaxWidth = (int) paint.measureText(adapter.getItemText(0));
+            mTextMaxWidth = paint!!.measureText(adapter!!.getItemText(0)).toInt()
         } else if (isPosInRang(textMaxWidthPosition)) {
-            mTextMaxWidth = (int) paint.measureText(adapter.getItemText(textMaxWidthPosition));
+            mTextMaxWidth = paint!!.measureText(adapter!!.getItemText(textMaxWidthPosition)).toInt()
         } else if (!TextUtils.isEmpty(maxWidthText)) {
-            mTextMaxWidth = (int) paint.measureText(maxWidthText);
+            mTextMaxWidth = paint!!.measureText(maxWidthText).toInt()
         } else {
-            final int itemCount = adapter.getItemCount();
-            for (int i = 0; i < itemCount; ++i) {
-                String text = adapter.getItemText(i);
-                int width = (int) paint.measureText(text);
-                mTextMaxWidth = Math.max(mTextMaxWidth, width);
+            val itemCount = adapter!!.itemCount
+            for (i in 0 until itemCount) {
+                val text = adapter!!.getItemText(i)
+                val width = paint!!.measureText(text).toInt()
+                mTextMaxWidth = Math.max(mTextMaxWidth, width)
             }
         }
-        final Paint.FontMetrics metrics = paint.getFontMetrics();
-        mTextMaxHeight = (int) (metrics.bottom - metrics.top);
+        val metrics = paint!!.fontMetrics
+        mTextMaxHeight = (metrics.bottom - metrics.top).toInt()
     }
 
-    private void updateItemTextAlign() {
-        switch (mItemAlign) {
-            case ALIGN_LEFT:
-                paint.setTextAlign(Paint.Align.LEFT);
-                break;
-            case ALIGN_RIGHT:
-                paint.setTextAlign(Paint.Align.RIGHT);
-                break;
-            default:
-                paint.setTextAlign(Paint.Align.CENTER);
-                break;
+    private fun updateItemTextAlign() {
+        when (mItemAlign) {
+            ALIGN_LEFT -> paint!!.textAlign = Paint.Align.LEFT
+            ALIGN_RIGHT -> paint!!.textAlign = Paint.Align.RIGHT
+            else -> paint!!.textAlign = Paint.Align.CENTER
         }
     }
 
-    protected void updateDefault() {
-        setSelectedItemPosition(getDefaultItemPosition());
+    protected fun updateDefault() {
+        setSelectedItemPosition(defaultItemPosition)
     }
 
-    public void setDefault(V defaultValue) {
-        this.defaultValue = defaultValue;
-        updateDefault();
+    fun setDefault(defaultValue: V) {
+        this.defaultValue = defaultValue
+        updateDefault()
     }
 
-    public void setDefaultDate(Date date) {
-        if (adapter != null && adapter.getItemCount() > 0) {
-            final int indexOfDate = findIndexOfDate(date);
+    fun setDefaultDate(date: Date) {
+        if (adapter != null && adapter!!.itemCount > 0) {
+            val indexOfDate = findIndexOfDate(date)
             if (indexOfDate >= 0) {
-                this.defaultValue = adapter.getData().get(indexOfDate);
-                setSelectedItemPosition(indexOfDate);
+                defaultValue = adapter!!.getData()!![indexOfDate]
+                setSelectedItemPosition(indexOfDate)
             }
         }
     }
 
-    public void setCustomLocale(Locale customLocale) {
-        this.customLocale = customLocale;
+    open fun setCustomLocale(customLocale: Locale?) {
+        this.customLocale = customLocale
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        final int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
-        final int modeHeight = MeasureSpec.getMode(heightMeasureSpec);
-
-        final int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
-        final int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val modeWidth = MeasureSpec.getMode(widthMeasureSpec)
+        val modeHeight = MeasureSpec.getMode(heightMeasureSpec)
+        val sizeWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val sizeHeight = MeasureSpec.getSize(heightMeasureSpec)
 
         // Correct sizes of original content
-        int resultWidth = mTextMaxWidth;
-        int resultHeight = mTextMaxHeight * mVisibleItemCount + mItemSpace * (mVisibleItemCount - 1);
+        var resultWidth = mTextMaxWidth
+        var resultHeight = mTextMaxHeight * mVisibleItemCount + mItemSpace * (mVisibleItemCount - 1)
 
         // Correct view sizes again if curved is enable
         if (isCurved) {
             // The text is written on the circle circumference from -mMaxAngle to mMaxAngle.
             // 2 * sinDegree(mMaxAngle): Height of drawn circle
             // Math.PI: Circumference of half unit circle, `mMaxAngle / 90f`: The ratio of half-circle we draw on
-            resultHeight = (int) (2 * sinDegree(mMaxAngle) / (Math.PI * mMaxAngle / 90f) * resultHeight);
+            resultHeight = (2 * sinDegree(mMaxAngle.toFloat()) / (Math.PI * mMaxAngle / 90f) * resultHeight).toInt()
         }
 
         // Consideration padding influence the view sizes
-        resultWidth += getPaddingLeft() + getPaddingRight();
-        resultHeight += getPaddingTop() + getPaddingBottom();
+        resultWidth += paddingLeft + paddingRight
+        resultHeight += paddingTop + paddingBottom
 
         // Consideration sizes of parent can influence the view sizes
-        resultWidth = measureSize(modeWidth, sizeWidth, resultWidth);
-        resultHeight = measureSize(modeHeight, sizeHeight, resultHeight);
-
-        setMeasuredDimension(resultWidth, resultHeight);
+        resultWidth = measureSize(modeWidth, sizeWidth, resultWidth)
+        resultHeight = measureSize(modeHeight, sizeHeight, resultHeight)
+        setMeasuredDimension(resultWidth, resultHeight)
     }
 
-    private int measureSize(int mode, int sizeExpect, int sizeActual) {
-        int realSize;
+    private fun measureSize(mode: Int, sizeExpect: Int, sizeActual: Int): Int {
+        var realSize: Int
         if (mode == MeasureSpec.EXACTLY) {
-            realSize = sizeExpect;
+            realSize = sizeExpect
         } else {
-            realSize = sizeActual;
-            if (mode == MeasureSpec.AT_MOST) realSize = Math.min(realSize, sizeExpect);
+            realSize = sizeActual
+            if (mode == MeasureSpec.AT_MOST) realSize = Math.min(realSize, sizeExpect)
         }
-        return realSize;
+        return realSize
     }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+    override fun onSizeChanged(w: Int, h: Int, oldW: Int, oldH: Int) {
         // Set content region
-        rectDrawn.set(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(),
-                getHeight() - getPaddingBottom());
+        rectDrawn[paddingLeft, paddingTop, width - paddingRight] = height - paddingBottom
 
         // Get the center coordinates of content region
-        wheelCenterX = rectDrawn.centerX();
-        wheelCenterY = rectDrawn.centerY();
+        wheelCenterX = rectDrawn.centerX()
+        wheelCenterY = rectDrawn.centerY()
 
         // Correct item drawn center
-        computeDrawnCenter();
-
-        mHalfWheelHeight = rectDrawn.height() / 2;
-
-        mItemHeight = rectDrawn.height() / mVisibleItemCount;
-        mHalfItemHeight = mItemHeight / 2;
+        computeDrawnCenter()
+        mHalfWheelHeight = rectDrawn.height() / 2
+        mItemHeight = rectDrawn.height() / mVisibleItemCount
+        mHalfItemHeight = mItemHeight / 2
 
         // Initialize fling max Y-coordinates
-        computeFlingLimitY();
+        computeFlingLimitY()
 
         // Correct region of indicator
-        computeIndicatorRect();
+        computeIndicatorRect()
 
         // Correct region of current select item
-        computeCurrentItemRect();
+        computeCurrentItemRect()
     }
 
-    private void computeDrawnCenter() {
-        switch (mItemAlign) {
-            case ALIGN_LEFT:
-                drawnCenterX = rectDrawn.left;
-                break;
-            case ALIGN_RIGHT:
-                drawnCenterX = rectDrawn.right;
-                break;
-            default:
-                drawnCenterX = wheelCenterX;
-                break;
+    private fun computeDrawnCenter() {
+        drawnCenterX = when (mItemAlign) {
+            ALIGN_LEFT -> rectDrawn.left
+            ALIGN_RIGHT -> rectDrawn.right
+            else -> wheelCenterX
         }
-        drawnCenterY = (int) (wheelCenterY - ((paint.ascent() + paint.descent()) / 2));
+        drawnCenterY = (wheelCenterY - (paint!!.ascent() + paint.descent()) / 2).toInt()
     }
 
-    private void computeFlingLimitY() {
-        int currentItemOffset = selectedItemPosition * mItemHeight;
-        minFlingY = isCyclic ? Integer.MIN_VALUE
-                : -mItemHeight * (adapter.getItemCount() - 1) + currentItemOffset;
-        maxFlingY = isCyclic ? Integer.MAX_VALUE : currentItemOffset;
+    private fun computeFlingLimitY() {
+        val currentItemOffset = selectedItemPosition * mItemHeight
+        minFlingY = if (isCyclic) Int.MIN_VALUE else -mItemHeight * (adapter!!.itemCount - 1) + currentItemOffset
+        maxFlingY = if (isCyclic) Int.MAX_VALUE else currentItemOffset
     }
 
-    private void computeIndicatorRect() {
-        if (!hasIndicator) return;
-        int halfIndicatorSize = mIndicatorSize / 2;
-        int indicatorHeadCenterY = wheelCenterY + mHalfItemHeight;
-        int indicatorFootCenterY = wheelCenterY - mHalfItemHeight;
-        rectIndicatorHead.set(rectDrawn.left, indicatorHeadCenterY - halfIndicatorSize, rectDrawn.right,
-                indicatorHeadCenterY + halfIndicatorSize);
-        rectIndicatorFoot.set(rectDrawn.left, indicatorFootCenterY - halfIndicatorSize, rectDrawn.right,
-                indicatorFootCenterY + halfIndicatorSize);
+    private fun computeIndicatorRect() {
+        if (!hasIndicator) return
+        val halfIndicatorSize = mIndicatorSize / 2
+        val indicatorHeadCenterY = wheelCenterY + mHalfItemHeight
+        val indicatorFootCenterY = wheelCenterY - mHalfItemHeight
+        rectIndicatorHead[rectDrawn.left, indicatorHeadCenterY - halfIndicatorSize, rectDrawn.right] = indicatorHeadCenterY + halfIndicatorSize
+        rectIndicatorFoot[rectDrawn.left, indicatorFootCenterY - halfIndicatorSize, rectDrawn.right] = indicatorFootCenterY + halfIndicatorSize
     }
 
-    private void computeCurrentItemRect() {
-        if (!hasCurtain && mSelectedItemTextColor == -1) return;
-        rectCurrentItem.set(rectDrawn.left, wheelCenterY - mHalfItemHeight, rectDrawn.right,
-                wheelCenterY + mHalfItemHeight);
+    private fun computeCurrentItemRect() {
+        if (!hasCurtain && mSelectedItemTextColor == -1) return
+        rectCurrentItem[rectDrawn.left, wheelCenterY - mHalfItemHeight, rectDrawn.right] = wheelCenterY + mHalfItemHeight
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        if (null != onWheelChangeListener) onWheelChangeListener.onWheelScrolled(scrollOffsetY);
+    override fun onDraw(canvas: Canvas) {
+        onWheelChangeListener?.onWheelScrolled(scrollOffsetY)
         if (mItemHeight - mHalfDrawnItemCount <= 0) {
-            return;
+            return
         }
-        int drawnDataStartPos = -scrollOffsetY / mItemHeight - mHalfDrawnItemCount;
-        for (int drawnDataPos = drawnDataStartPos + selectedItemPosition,
-             drawnOffsetPos = -mHalfDrawnItemCount;
-             drawnDataPos < drawnDataStartPos + selectedItemPosition + mDrawnItemCount;
-             drawnDataPos++, drawnOffsetPos++) {
-            String data = "";
+        val drawnDataStartPos = -scrollOffsetY / mItemHeight - mHalfDrawnItemCount
+        var drawnDataPos = drawnDataStartPos + selectedItemPosition
+        var drawnOffsetPos = -mHalfDrawnItemCount
+        while (drawnDataPos < drawnDataStartPos + selectedItemPosition + mDrawnItemCount) {
+            var data = ""
             if (isCyclic) {
-                final int itemCount = this.adapter.getItemCount();
-                int actualPos = drawnDataPos % itemCount;
-                actualPos = actualPos < 0 ? (actualPos + itemCount) : actualPos;
-                data = adapter.getItemText(actualPos);
+                val itemCount = adapter!!.itemCount
+                var actualPos = drawnDataPos % itemCount
+                actualPos = if (actualPos < 0) actualPos + itemCount else actualPos
+                data = adapter!!.getItemText(actualPos)
             } else {
                 if (isPosInRang(drawnDataPos)) {
-                    data = adapter.getItemText(drawnDataPos);
+                    data = adapter!!.getItemText(drawnDataPos)
                 }
             }
-            paint.setColor(mItemTextColor);
-            paint.setStyle(Paint.Style.FILL);
-            int mDrawnItemCenterY = drawnCenterY + (drawnOffsetPos * mItemHeight) +
-                    scrollOffsetY % mItemHeight;
-
-            float distanceToCenter = 0;
+            paint!!.color = mItemTextColor
+            paint.style = Paint.Style.FILL
+            val mDrawnItemCenterY = drawnCenterY + drawnOffsetPos * mItemHeight + scrollOffsetY % mItemHeight
+            var distanceToCenter = 0f
             if (isCurved) {
                 // Correct ratio of item's drawn center to wheel center
-                float ratio = (drawnCenterY - Math.abs(drawnCenterY - mDrawnItemCenterY) -
-                        rectDrawn.top) * 1.0F / (drawnCenterY - rectDrawn.top);
+                val ratio = (drawnCenterY - Math.abs(drawnCenterY - mDrawnItemCenterY) -
+                        rectDrawn.top) * 1.0f / (drawnCenterY - rectDrawn.top)
 
                 // Correct unit
-                int unit = 0;
+                var unit = 0
                 if (mDrawnItemCenterY > drawnCenterY) {
-                    unit = 1;
-                } else if (mDrawnItemCenterY < drawnCenterY) unit = -1;
-
-                float degree = clamp((-(1 - ratio) * mMaxAngle * unit), -mMaxAngle, mMaxAngle);
-                distanceToCenter = computeYCoordinateAtAngle(degree);
-
-                float transX = wheelCenterX;
-                switch (mItemAlign) {
-                    case ALIGN_LEFT:
-                        transX = rectDrawn.left;
-                        break;
-                    case ALIGN_RIGHT:
-                        transX = rectDrawn.right;
-                        break;
+                    unit = 1
+                } else if (mDrawnItemCenterY < drawnCenterY) unit = -1
+                val degree = clamp(-(1 - ratio) * mMaxAngle * unit, -mMaxAngle.toFloat(), mMaxAngle.toFloat())
+                distanceToCenter = computeYCoordinateAtAngle(degree)
+                var transX = wheelCenterX.toFloat()
+                when (mItemAlign) {
+                    ALIGN_LEFT -> transX = rectDrawn.left.toFloat()
+                    ALIGN_RIGHT -> transX = rectDrawn.right.toFloat()
                 }
-                float transY = wheelCenterY - distanceToCenter;
-
-                camera.save();
-                camera.rotateX(degree);
-                camera.getMatrix(matrixRotate);
-                camera.restore();
-                matrixRotate.preTranslate(-transX, -transY);
-                matrixRotate.postTranslate(transX, transY);
-
-                camera.save();
-                camera.translate(0, 0, computeDepth((int) degree));
-                camera.getMatrix(matrixDepth);
-                camera.restore();
-                matrixDepth.preTranslate(-transX, -transY);
-                matrixDepth.postTranslate(transX, transY);
-
-                matrixRotate.postConcat(matrixDepth);
+                val transY = wheelCenterY - distanceToCenter
+                camera.save()
+                camera.rotateX(degree)
+                camera.getMatrix(matrixRotate)
+                camera.restore()
+                matrixRotate.preTranslate(-transX, -transY)
+                matrixRotate.postTranslate(transX, transY)
+                camera.save()
+                camera.translate(0f, 0f, computeDepth(degree.toInt().toFloat()))
+                camera.getMatrix(matrixDepth)
+                camera.restore()
+                matrixDepth.preTranslate(-transX, -transY)
+                matrixDepth.postTranslate(transX, transY)
+                matrixRotate.postConcat(matrixDepth)
             }
             if (hasAtmospheric) {
-                int alpha =
-                        (int) ((drawnCenterY - Math.abs(drawnCenterY - mDrawnItemCenterY)) * 1.0F / drawnCenterY
-                                * 255);
-                alpha = alpha < 0 ? 0 : alpha;
-                paint.setAlpha(alpha);
+                var alpha = ((drawnCenterY - Math.abs(drawnCenterY - mDrawnItemCenterY)) * 1.0f / drawnCenterY
+                        * 255).toInt()
+                alpha = if (alpha < 0) 0 else alpha
+                paint.alpha = alpha
             }
             // Correct item's drawn centerY base on curved state
-            float drawnCenterY = isCurved ? this.drawnCenterY - distanceToCenter : mDrawnItemCenterY;
+            val drawnCenterY = if (isCurved) drawnCenterY - distanceToCenter else mDrawnItemCenterY.toFloat()
 
             // Judges need to draw different color for current item or not
             if (mSelectedItemTextColor != -1) {
-                canvas.save();
-                if (isCurved) canvas.concat(matrixRotate);
-                canvas.clipRect(rectCurrentItem, Region.Op.DIFFERENCE);
-                canvas.drawText(data, drawnCenterX, drawnCenterY, paint);
-                canvas.restore();
-
-                paint.setColor(mSelectedItemTextColor);
-                canvas.save();
-                if (isCurved) canvas.concat(matrixRotate);
-                canvas.clipRect(rectCurrentItem);
-                canvas.drawText(data, drawnCenterX, drawnCenterY, paint);
-                canvas.restore();
+                canvas.save()
+                if (isCurved) canvas.concat(matrixRotate)
+                canvas.clipRect(rectCurrentItem, Region.Op.DIFFERENCE)
+                canvas.drawText(data, drawnCenterX.toFloat(), drawnCenterY, paint)
+                canvas.restore()
+                paint.color = mSelectedItemTextColor
+                canvas.save()
+                if (isCurved) canvas.concat(matrixRotate)
+                canvas.clipRect(rectCurrentItem)
+                canvas.drawText(data, drawnCenterX.toFloat(), drawnCenterY, paint)
+                canvas.restore()
             } else {
-                canvas.save();
-                canvas.clipRect(rectDrawn);
-                if (isCurved) canvas.concat(matrixRotate);
-                canvas.drawText(data, drawnCenterX, drawnCenterY, paint);
-                canvas.restore();
+                canvas.save()
+                canvas.clipRect(rectDrawn)
+                if (isCurved) canvas.concat(matrixRotate)
+                canvas.drawText(data, drawnCenterX.toFloat(), drawnCenterY, paint)
+                canvas.restore()
             }
+            drawnDataPos++
+            drawnOffsetPos++
         }
         // Need to draw curtain or not
         if (hasCurtain) {
-            paint.setColor(mCurtainColor);
-            paint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(rectCurrentItem, paint);
+            paint!!.color = mCurtainColor
+            paint.style = Paint.Style.FILL
+            canvas.drawRect(rectCurrentItem, paint)
         }
         // Need to draw indicator or not
         if (hasIndicator) {
-            paint.setColor(mIndicatorColor);
-            paint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(rectIndicatorHead, paint);
-            canvas.drawRect(rectIndicatorFoot, paint);
+            paint!!.color = mIndicatorColor
+            paint.style = Paint.Style.FILL
+            canvas.drawRect(rectIndicatorHead, paint)
+            canvas.drawRect(rectIndicatorFoot, paint)
         }
     }
 
-    private boolean isPosInRang(int position) {
-        return position >= 0 && position < adapter.getItemCount();
+    private fun isPosInRang(position: Int): Boolean {
+        return position >= 0 && position < adapter!!.itemCount
     }
 
-    private float computeYCoordinateAtAngle(float degree) {
+    private fun computeYCoordinateAtAngle(degree: Float): Float {
         // Compute y-coordinate for item at degree. mMaxAngle is at mHalfWheelHeight
-        return sinDegree(degree) / sinDegree(mMaxAngle) * mHalfWheelHeight;
+        return sinDegree(degree) / sinDegree(mMaxAngle.toFloat()) * mHalfWheelHeight
     }
 
-    private float sinDegree(float degree) {
-        return (float) Math.sin(Math.toRadians(degree));
+    private fun sinDegree(degree: Float): Float {
+        return Math.sin(Math.toRadians(degree.toDouble())).toFloat()
     }
 
-    private float computeDepth(float degree) {
-        return (float) (mHalfWheelHeight - Math.cos(Math.toRadians(degree)) * mHalfWheelHeight);
+    private fun computeDepth(degree: Float): Float {
+        return (mHalfWheelHeight - Math.cos(Math.toRadians(degree.toDouble())) * mHalfWheelHeight).toFloat()
     }
 
-    private float clamp(float value, float min, float max) {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
+    private fun clamp(value: Float, min: Float, max: Float): Float {
+        if (value < min) return min
+        return if (value > max) max else value
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (isEnabled()) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (null != getParent()) getParent().requestDisallowInterceptTouchEvent(true);
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (isEnabled) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (null != parent) parent.requestDisallowInterceptTouchEvent(true)
                     if (null == tracker) {
-                        tracker = VelocityTracker.obtain();
+                        tracker = VelocityTracker.obtain()
                     } else {
-                        tracker.clear();
+                        tracker!!.clear()
                     }
-                    tracker.addMovement(event);
-                    if (!scroller.isFinished()) {
-                        scroller.abortAnimation();
-                        isForceFinishScroll = true;
+                    tracker!!.addMovement(event)
+                    if (!scroller!!.isFinished) {
+                        scroller!!.abortAnimation()
+                        isForceFinishScroll = true
                     }
-                    downPointY = lastPointY = (int) event.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (Math.abs(downPointY - event.getY()) < touchSlop
-                            && computeDistanceToEndPoint(scroller.getFinalY() % mItemHeight) > 0) {
-                        isClick = true;
-                        break;
+                    run {
+                        lastPointY = event.y.toInt()
+                        downPointY = lastPointY
                     }
-                    isClick = false;
-                    tracker.addMovement(event);
-                    if (null != onWheelChangeListener) {
-                        onWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING);
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (abs(downPointY - event.y) < touchSlop
+                        && computeDistanceToEndPoint(scroller!!.finalY % mItemHeight) > 0
+                    ) {
+                        isClick = true
+                        //break
+                        //return true
                     }
+                    isClick = false
+                    tracker!!.addMovement(event)
+                    onWheelChangeListener?.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING)
 
                     // Scroll WheelPicker's content
-                    float move = event.getY() - lastPointY;
-                    if (Math.abs(move) < 1) break;
-                    scrollOffsetY += move;
-                    lastPointY = (int) event.getY();
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (null != getParent()) getParent().requestDisallowInterceptTouchEvent(false);
-                    if (isClick) break;
-                    tracker.addMovement(event);
-
+                    val move = event.y - lastPointY
+                    if (abs(move) < 1) //return true
+                    scrollOffsetY += move.toInt()
+                    lastPointY = event.y.toInt()
+                    invalidate()
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (null != parent) parent.requestDisallowInterceptTouchEvent(false)
+                    if (isClick) //break
+                    tracker!!.addMovement(event)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
-                        tracker.computeCurrentVelocity(1000, maximumVelocity);
+                        tracker!!.computeCurrentVelocity(1000, maximumVelocity.toFloat())
                     } else {
-                        tracker.computeCurrentVelocity(1000);
+                        tracker!!.computeCurrentVelocity(1000)
                     }
 
                     // Judges the WheelPicker is scroll or fling base on current velocity
-                    isForceFinishScroll = false;
-                    int velocity = (int) tracker.getYVelocity();
-                    if (Math.abs(velocity) > minimumVelocity) {
-                        scroller.fling(0, scrollOffsetY, 0, velocity, 0, 0, minFlingY, maxFlingY);
-                        scroller.setFinalY(
-                                scroller.getFinalY() + computeDistanceToEndPoint(scroller.getFinalY() % mItemHeight));
+                    isForceFinishScroll = false
+                    val velocity = tracker!!.yVelocity.toInt()
+                    if (abs(velocity) > minimumVelocity) {
+                        if(scroller != null){
+                            scroller!!.fling(0, scrollOffsetY, 0, velocity, 0, 0, minFlingY, maxFlingY)
+                            scroller!!.finalY = scroller!!.finalY + computeDistanceToEndPoint(scroller!!.finalY % mItemHeight)
+                        }
                     } else {
-                        scroller.startScroll(0, scrollOffsetY, 0,
-                                computeDistanceToEndPoint(scrollOffsetY % mItemHeight));
+                        scroller!!.startScroll(
+                            0, scrollOffsetY, 0,
+                            computeDistanceToEndPoint(scrollOffsetY % mItemHeight)
+                        )
                     }
                     // Correct coordinates
-                    if (!isCyclic) {
-                        if (scroller.getFinalY() > maxFlingY) {
-                            scroller.setFinalY(maxFlingY);
-                        } else if (scroller.getFinalY() < minFlingY) scroller.setFinalY(minFlingY);
+                    if (!isCyclic && scroller != null) {
+                        if (scroller!!.finalY > maxFlingY) {
+                            scroller!!.finalY = maxFlingY
+                        } else if (scroller!!.finalY < minFlingY) scroller!!.finalY = minFlingY
                     }
-                    handler.post(runnable);
+                    handler.post(runnable)
                     if (null != tracker) {
-                        tracker.recycle();
-                        tracker = null;
+                        tracker!!.recycle()
+                        tracker = null
                     }
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                    if (null != getParent()) getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    if (null != parent) parent.requestDisallowInterceptTouchEvent(false)
                     if (null != tracker) {
-                        tracker.recycle();
-                        tracker = null;
+                        tracker!!.recycle()
+                        tracker = null
                     }
-                    break;
+                }
             }
         }
-        return true;
+        return true
     }
 
-    private int computeDistanceToEndPoint(int remainder) {
-        if (Math.abs(remainder) > mHalfItemHeight) {
+    private fun computeDistanceToEndPoint(remainder: Int): Int {
+        return if (Math.abs(remainder) > mHalfItemHeight) {
             if (scrollOffsetY < 0) {
-                return -mItemHeight - remainder;
+                -mItemHeight - remainder
             } else {
-                return mItemHeight - remainder;
+                mItemHeight - remainder
             }
         } else {
-            return -remainder;
+            -remainder
         }
     }
 
-    public void scrollTo(final int itemPosition) {
+    fun scrollTo(itemPosition: Int) {
         if (itemPosition != currentItemPosition) {
-            final int differencesLines = currentItemPosition - itemPosition;
-            final int newScrollOffsetY =
-                    scrollOffsetY + (differencesLines * mItemHeight); // % adapter.getItemCount();
-
-            ValueAnimator va = ValueAnimator.ofInt(scrollOffsetY, newScrollOffsetY);
-            va.setDuration(300);
-            va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    scrollOffsetY = (int) animation.getAnimatedValue();
-                    invalidate();
+            val differencesLines = currentItemPosition - itemPosition
+            val newScrollOffsetY = scrollOffsetY + differencesLines * mItemHeight // % adapter.getItemCount();
+            val va = ValueAnimator.ofInt(scrollOffsetY, newScrollOffsetY)
+            va.duration = 300
+            va.addUpdateListener { animation ->
+                scrollOffsetY = animation.animatedValue as Int
+                invalidate()
+            }
+            va.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    currentItemPosition = itemPosition
+                    onItemSelected()
                 }
-            });
-            va.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    currentItemPosition = itemPosition;
-                    onItemSelected();
-                }
-            });
-            va.start();
+            })
+            va.start()
         }
     }
 
-    private final void onItemSelected() {
-        int position = currentItemPosition;
-        final V item = this.adapter.getItem(position);
-        if (null != onItemSelectedListener) {
-            onItemSelectedListener.onItemSelected(this, item, position);
+    private fun onItemSelected() {
+        val position = currentItemPosition
+        val item: V? = adapter!!.getItem(position)
+        onItemSelectedListener?.onItemSelected(this, item, position)
+        if (item != null) {
+            onItemSelected(position, item)
         }
-        onItemSelected(position, item);
     }
 
-    protected void onItemSelected(int position, V item) {
+    protected fun onItemSelected(position: Int, item: V) {
         if (listener != null) {
-            listener.onSelected(this, position, item);
+            listener!!.onSelected(this, position, item)
         }
     }
 
-
-    protected void onItemCurrentScroll(int position, V item) {
+    protected fun onItemCurrentScroll(position: Int, item: V) {
         if (lastScrollPosition != position) {
             if (listener != null) {
-                listener.onCurrentScrolled(this, position, item);
-                if (lastScrollPosition == adapter.getItemCount() - 1 && position == 0) {
-                    onFinishedLoop();
+                listener!!.onCurrentScrolled(this, position, item)
+                if (lastScrollPosition == adapter!!.itemCount - 1 && position == 0) {
+                    onFinishedLoop()
                 }
             }
-            lastScrollPosition = position;
+            lastScrollPosition = position
         }
     }
 
-    protected void onFinishedLoop() {
-
+    protected open fun onFinishedLoop() {}
+    protected open fun getFormattedValue(value: Any): String {
+        return value.toString()
     }
 
-    protected String getFormattedValue(Object value) {
-        return String.valueOf(value);
+    fun setVisibleItemCount(count: Int) {
+        mVisibleItemCount = count
+        updateVisibleItemCount()
+        requestLayout()
     }
 
-    public void setVisibleItemCount(int count) {
-        mVisibleItemCount = count;
-        updateVisibleItemCount();
-        requestLayout();
+    fun setCyclic(isCyclic: Boolean) {
+        this.isCyclic = isCyclic
+        computeFlingLimitY()
+        invalidate()
     }
 
-    public void setCyclic(boolean isCyclic) {
-        this.isCyclic = isCyclic;
-        computeFlingLimitY();
-        invalidate();
+    fun setSelectedItemPosition(position: Int) {
+        var position = position
+        position = Math.min(position, adapter!!.itemCount - 1)
+        position = Math.max(position, 0)
+        selectedItemPosition = position
+        currentItemPosition = position
+        scrollOffsetY = 0
+        computeFlingLimitY()
+        requestLayout()
+        invalidate()
     }
 
-    public void setSelectedItemPosition(int position) {
-        position = Math.min(position, adapter.getItemCount() - 1);
-        position = Math.max(position, 0);
-        selectedItemPosition = position;
-        currentItemPosition = position;
-        scrollOffsetY = 0;
-        computeFlingLimitY();
-        requestLayout();
-        invalidate();
-    }
-
-    public int getCurrentItemPosition() {
-        return currentItemPosition;
-    }
-
-    public int getDefaultItemPosition() {
-        return adapter.getData().indexOf(defaultValue);
-    }
-
-    public int getTodayItemPosition() {
-        List<V> list = adapter.getData();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof DateWithLabel) {
-                DateWithLabel dwl = (DateWithLabel) list.get(i);
-                if (dwl.getLabel().equals(getLocalizedString(R.string.picker_today))) {
-                    return i;
+    val defaultItemPosition: Int
+        get() = adapter!!.getData().indexOf(defaultValue)
+    val todayItemPosition: Int
+        get() {
+            val list = adapter!!.getData()
+            for (i in list.indices) {
+                if (list[i] is DateWithLabel) {
+                    val (label) = list[i] as DateWithLabel
+                    if (label == getLocalizedString(R.string.picker_today)) {
+                        return i
+                    }
                 }
             }
+            return 0
         }
-        return 0;
+
+    @JvmName("setAdapter1")
+    fun setAdapter(adapter: Adapter<V>?) {
+        this.adapter = adapter
+        updateItemTextAlign()
+        computeTextSize()
+        notifyDatasetChanged()
     }
 
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
-
-        updateItemTextAlign();
-
-        computeTextSize();
-
-        notifyDatasetChanged();
-    }
-
-    public void notifyDatasetChanged() {
-        if (selectedItemPosition > adapter.getItemCount() - 1
-                || currentItemPosition > adapter.getItemCount() - 1) {
-            selectedItemPosition = currentItemPosition = adapter.getItemCount() - 1;
+    fun notifyDatasetChanged() {
+        if (selectedItemPosition > adapter!!.itemCount - 1
+            || currentItemPosition > adapter!!.itemCount - 1
+        ) {
+            currentItemPosition = adapter!!.itemCount - 1
+            selectedItemPosition = currentItemPosition
         } else {
-            selectedItemPosition = currentItemPosition;
+            selectedItemPosition = currentItemPosition
         }
-        scrollOffsetY = 0;
-        computeTextSize();
-        computeFlingLimitY();
-        requestLayout();
-        postInvalidate();
+        scrollOffsetY = 0
+        computeTextSize()
+        computeFlingLimitY()
+        requestLayout()
+        postInvalidate()
     }
 
-    public void setSelectedItemTextColor(int color) {
-        mSelectedItemTextColor = color;
-        computeCurrentItemRect();
-        postInvalidate();
+    fun setSelectedItemTextColor(color: Int) {
+        mSelectedItemTextColor = color
+        computeCurrentItemRect()
+        postInvalidate()
     }
 
-    public void setItemTextColor(int color) {
-        mItemTextColor = color;
-        postInvalidate();
+    fun setItemTextColor(color: Int) {
+        mItemTextColor = color
+        postInvalidate()
     }
 
-    public void setItemTextSize(int size) {
-
+    fun setItemTextSize(size: Int) {
         if (mItemTextSize != size) {
-            mItemTextSize = size;
-            paint.setTextSize(mItemTextSize);
-            computeTextSize();
-            requestLayout();
-            postInvalidate();
+            mItemTextSize = size
+            paint!!.textSize = mItemTextSize.toFloat()
+            computeTextSize()
+            requestLayout()
+            postInvalidate()
         }
     }
 
-    public void setItemSpace(int space) {
-        mItemSpace = space;
-        requestLayout();
-        postInvalidate();
+    fun setItemSpace(space: Int) {
+        mItemSpace = space
+        requestLayout()
+        postInvalidate()
     }
 
-    public void setCurvedMaxAngle(int maxAngle) {
-        this.mMaxAngle = maxAngle;
-        requestLayout();
-        postInvalidate();
+    fun setCurvedMaxAngle(maxAngle: Int) {
+        mMaxAngle = maxAngle
+        requestLayout()
+        postInvalidate()
     }
 
-    public void setCurved(boolean isCurved) {
-        this.isCurved = isCurved;
-        requestLayout();
-        postInvalidate();
+    fun setCurved(isCurved: Boolean) {
+        this.isCurved = isCurved
+        requestLayout()
+        postInvalidate()
     }
 
-    public void setItemAlign(int align) {
-        mItemAlign = align;
-        updateItemTextAlign();
-        computeDrawnCenter();
-        postInvalidate();
+    fun setItemAlign(align: Int) {
+        mItemAlign = align
+        updateItemTextAlign()
+        computeDrawnCenter()
+        postInvalidate()
     }
 
-    public void setTypeface(Typeface tf) {
-        if (null != paint) paint.setTypeface(tf);
-        computeTextSize();
-        requestLayout();
-        postInvalidate();
+    fun setTypeface(tf: Typeface?) {
+        if (null != paint) paint.typeface = tf
+        computeTextSize()
+        requestLayout()
+        postInvalidate()
     }
 
     /**
-     * TODO: {@link Adapter#data} could contain 'Data' class objects. 'Data' could be composed of
+     * TODO: [Adapter.data] could contain 'Data' class objects. 'Data' could be composed of
      * a String: displayedValue (the value to be displayed in the wheel) and
      * a Date/Calendar: comparisonDate (a reference date/calendar that will help to find the index).
-     * This could clean this method and {@link #getFormattedValue(Object)}.
-     * <p>
+     * This could clean this method and [.getFormattedValue].
+     *
+     *
      * Finds the index in the wheel for a date
      *
      * @param date the targeted date
-     * @return the index closed to {@code date}. Returns 0 if not found.
+     * @return the index closed to `date`. Returns 0 if not found.
      */
-    public int findIndexOfDate(@NonNull Date date) {
-        String formatItem = getFormattedValue(date);
-
-        if (this instanceof WheelDayOfMonthPicker) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeZone(dateHelper.getTimeZone());
-            calendar.setTime(date);
-            return calendar.get(Calendar.DAY_OF_MONTH) - 1;
+    fun findIndexOfDate(date: Date): Int {
+        val formatItem = getFormattedValue(date)
+        if (this is WheelDayOfMonthPicker) {
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            calendar.time = date
+            return calendar[Calendar.DAY_OF_MONTH] - 1
         }
-
-        if (this instanceof WheelDayPicker) {
-            String today = getFormattedValue(new Date());
-            if (today.equals(formatItem)) {
-                return getTodayItemPosition();
+        if (this is WheelDayPicker) {
+            val today = getFormattedValue(Date())
+            if (today == formatItem) {
+                return todayItemPosition
             }
         }
-
-        if (this instanceof WheelMonthPicker) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeZone(dateHelper.getTimeZone());
-            calendar.setTime(date);
-            return calendar.get(Calendar.MONTH);
+        if (this is WheelMonthPicker) {
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            calendar.time = date
+            return calendar[Calendar.MONTH]
         }
-
-        if (this instanceof WheelYearPicker) {
-            WheelYearPicker yearPick = (WheelYearPicker) this;
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeZone(dateHelper.getTimeZone());
-            calendar.setTime(date);
-            return calendar.get(Calendar.YEAR) - yearPick.minYear;
+        if (this is WheelYearPicker) {
+            val yearPick = this as WheelYearPicker
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = dateHelper.getTimeZone()
+            calendar.time = date
+            return calendar[Calendar.YEAR] - yearPick.minYear
         }
-
-        int formatItemInt = Integer.MIN_VALUE;
+        var formatItemInt = Int.MIN_VALUE
         try {
-            formatItemInt = Integer.parseInt(formatItem);
-        } catch (NumberFormatException e) {
+            formatItemInt = formatItem.toInt()
+        } catch (e: NumberFormatException) {
         }
-
-        final int itemCount = adapter.getItemCount();
-        int index = 0;
-        for (int i = 0; i < itemCount; ++i) {
-            final String object = adapter.getItemText(i);
-
-            if (formatItemInt != Integer.MIN_VALUE) {
+        val itemCount = adapter!!.itemCount
+        var index = 0
+        for (i in 0 until itemCount) {
+            val `object` = adapter!!.getItemText(i)
+            if (formatItemInt != Int.MIN_VALUE) {
                 // displayed values are Integers
-                int objectInt = Integer.parseInt(object);
+                val objectInt = `object`.toInt()
                 if (objectInt <= formatItemInt) {
-                    index = i;
+                    index = i
                 }
-            } else if (formatItem.equals(object)) {
-                return i;
+            } else if (formatItem == `object`) {
+                return i
             }
         }
-        return index;
+        return index
     }
 
-    public String getLocalizedString(@StringRes int stringRes) {
-        return LocaleHelper.getString(getContext(), getCurrentLocale(), stringRes);
+    fun getLocalizedString(@StringRes stringRes: Int): String {
+        return getString(context, currentLocale, stringRes)
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
-    public Locale getCurrentLocale() {
-        if (customLocale != null) {
-            return customLocale;
+    @get:TargetApi(Build.VERSION_CODES.N)
+    val currentLocale: Locale
+        get() {
+            if (customLocale != null) {
+                return customLocale as Locale
+            }
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                resources.configuration.locales[0]
+            } else {
+                resources.configuration.locale
+            }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return getResources().getConfiguration().getLocales().get(0);
-        } else {
-            //noinspection deprecation
-            return getResources().getConfiguration().locale;
-        }
+
+    @JvmName("setDateHelper1")
+    fun setDateHelper(dateHelper: DateHelper) {
+        this.dateHelper = dateHelper
     }
 
-    public void setDateHelper(DateHelper dateHelper) {
-        this.dateHelper = dateHelper;
+    interface BaseAdapter<V> {
+        val itemCount: Int
+        fun getItem(position: Int): V
+        fun getItemText(position: Int): String
     }
 
-    public void setShowOnlyFutureDate(boolean showOnlyFutureDate) {
-        this.showOnlyFutureDate = showOnlyFutureDate;
+    interface OnItemSelectedListener {
+        fun onItemSelected(picker: WheelPicker<*>?, data: Any?, position: Int)
+        fun onCurrentItemOfScroll(picker: WheelPicker<*>?, position: Int)
     }
 
-    public boolean getShowOnlyFutureDate() {
-        return showOnlyFutureDate;
-    }
-
-    public interface BaseAdapter<V> {
-
-        int getItemCount();
-
-        V getItem(int position);
-
-        String getItemText(int position);
-    }
-
-    public interface OnItemSelectedListener {
-        void onItemSelected(WheelPicker picker, Object data, int position);
-
-        void onCurrentItemOfScroll(WheelPicker picker, int position);
-    }
-
-    public interface OnWheelChangeListener {
+    interface OnWheelChangeListener {
         /**
-         * <p>
+         *
+         *
          * Invoke when WheelPicker scroll stopped
          * WheelPicker will return a distance offset which between current scroll position and
          * initial position, this offset is a positive or a negative, positive means WheelPicker is
          * scrolling from bottom to top, negative means WheelPicker is scrolling from top to bottom
          *
-         * @param offset <p>
-         *               Distance offset which between current scroll position and initial position
+         * @param offset
+         *
+         *
+         * Distance offset which between current scroll position and initial position
          */
-        void onWheelScrolled(int offset);
+        fun onWheelScrolled(offset: Int)
 
         /**
-         * <p>
+         *
+         *
          * Invoke when WheelPicker scroll stopped
          * This method will be called when WheelPicker stop and return current selected item data's
          * position in list
          *
-         * @param position <p>
-         *                 Current selected item data's position in list
+         * @param position
+         *
+         *
+         * Current selected item data's position in list
          */
-        void onWheelSelected(int position);
+        fun onWheelSelected(position: Int)
 
         /**
-         * <p>
+         *
+         *
          * Invoke when WheelPicker's scroll state changed
          * The state of WheelPicker always between idle, dragging, and scrolling, this method will
          * be called when they switch
          *
-         * @param state {@link WheelPicker#SCROLL_STATE_IDLE}
-         *              {@link WheelPicker#SCROLL_STATE_DRAGGING}
-         *              {@link WheelPicker#SCROLL_STATE_SCROLLING}
-         *              <p>
-         *              State of WheelPicker, only one of the following
-         *              {@link WheelPicker#SCROLL_STATE_IDLE}
-         *              Express WheelPicker in state of idle
-         *              {@link WheelPicker#SCROLL_STATE_DRAGGING}
-         *              Express WheelPicker in state of dragging
-         *              {@link WheelPicker#SCROLL_STATE_SCROLLING}
-         *              Express WheelPicker in state of scrolling
+         * @param state [WheelPicker.SCROLL_STATE_IDLE]
+         * [WheelPicker.SCROLL_STATE_DRAGGING]
+         * [WheelPicker.SCROLL_STATE_SCROLLING]
+         *
+         *
+         * State of WheelPicker, only one of the following
+         * [WheelPicker.SCROLL_STATE_IDLE]
+         * Express WheelPicker in state of idle
+         * [WheelPicker.SCROLL_STATE_DRAGGING]
+         * Express WheelPicker in state of dragging
+         * [WheelPicker.SCROLL_STATE_SCROLLING]
+         * Express WheelPicker in state of scrolling
          */
-        void onWheelScrollStateChanged(int state);
+        fun onWheelScrollStateChanged(state: Int)
     }
 
-    protected interface Listener<PICKER extends WheelPicker, V> {
-        void onSelected(PICKER picker, int position, V value);
-
-        void onCurrentScrolled(PICKER picker, int position, V value);
+    protected interface Listener<PICKER : WheelPicker<*>?, V> {
+        fun onSelected(picker: PICKER, position: Int, value: V)
+        fun onCurrentScrolled(picker: PICKER, position: Int, value: V)
     }
 
-    public static class Adapter<V> implements BaseAdapter {
-        private List<V> data;
+    class Adapter<V> @JvmOverloads constructor(data: List<V> = ArrayList()) : BaseAdapter<Any?> {
+        val data: MutableList<V> = ArrayList()
+        init {
+            this.data.addAll(data)
+        }
+        override val itemCount: Int
+            get() = data.size
 
-        public Adapter() {
-            this(new ArrayList<V>());
+        override fun getItem(position: Int): V? {
+            val itemCount = itemCount
+            return if (itemCount == 0) null else data[(position + itemCount) % itemCount]
         }
 
-        public Adapter(List<V> data) {
-            this.data = new ArrayList<V>();
-            this.data.addAll(data);
-        }
-
-        @Override
-        public int getItemCount() {
-            return data.size();
-        }
-
-        @Override
-        public V getItem(int position) {
-            final int itemCount = getItemCount();
-            return itemCount == 0 ? null : data.get((position + itemCount) % itemCount);
-        }
-
-        @Override
-        public String getItemText(int position) {
-            try {
-                return String.valueOf(data.get(position));
-            } catch (Throwable t) {
-                return "";
+        override fun getItemText(position: Int): String {
+            return try {
+                data[position].toString()
+            } catch (t: Throwable) {
+                ""
             }
         }
 
-        public List<V> getData() {
-            return data;
-        }
+        @JvmName("getData1")
+        fun getData(): List<V> = data.toList()
 
-        public void setData(List<V> data) {
-            this.data.clear();
-            this.data.addAll(data);
-        }
-
-        public int getItemPosition(V value) {
-            int position = -1;
+        fun setData(data: List<V>?) {
+            this.data.clear()
             if (data != null) {
-                return data.indexOf(value);
+                this.data.addAll(data)
             }
-            return position;
         }
+
+        fun getItemPosition(value: V): Int {
+            val position = -1
+            return data.indexOf(value) ?: position
+        }
+    }
+
+    companion object {
+        const val SCROLL_STATE_IDLE = 0
+        const val SCROLL_STATE_DRAGGING = 1
+        const val SCROLL_STATE_SCROLLING = 2
+        const val ALIGN_CENTER = 0
+        const val ALIGN_LEFT = 1
+        const val ALIGN_RIGHT = 2
+        const val MAX_ANGLE = 90
+        protected const val FORMAT = "%1$02d" // two digits
+    }
+
+    init {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.WheelPicker)
+        mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size, resources.getDimensionPixelSize(R.dimen.WheelItemTextSize))
+        mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7)
+        selectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0)
+        hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false)
+        textMaxWidthPosition = a.getInt(R.styleable.WheelPicker_wheel_maximum_width_text_position, -1)
+        maxWidthText = a.getString(R.styleable.WheelPicker_wheel_maximum_width_text)
+        mSelectedItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_selected_item_text_color, -1)
+        mItemTextColor = a.getColor(R.styleable.WheelPicker_wheel_item_text_color, -0x777778)
+        mItemSpace = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_space, resources.getDimensionPixelSize(R.dimen.WheelItemSpace))
+        isCyclic = a.getBoolean(R.styleable.WheelPicker_wheel_cyclic, false)
+        hasIndicator = a.getBoolean(R.styleable.WheelPicker_wheel_indicator, false)
+        mIndicatorColor = a.getColor(R.styleable.WheelPicker_wheel_indicator_color, -0x11cccd)
+        mIndicatorSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_size, resources.getDimensionPixelSize(R.dimen.WheelIndicatorSize))
+        hasCurtain = a.getBoolean(R.styleable.WheelPicker_wheel_curtain, false)
+        mCurtainColor = a.getColor(R.styleable.WheelPicker_wheel_curtain_color, -0x77000001)
+        hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false)
+        isCurved = a.getBoolean(R.styleable.WheelPicker_wheel_curved, false)
+        mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER)
+        a.recycle()
+        updateVisibleItemCount()
+        paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.DITHER_FLAG or Paint.LINEAR_TEXT_FLAG)
+        paint.textSize = mItemTextSize.toFloat()
+        scroller = Scroller(getContext())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
+            val conf = ViewConfiguration.get(getContext())
+            minimumVelocity = conf.scaledMinimumFlingVelocity
+            maximumVelocity = conf.scaledMaximumFlingVelocity
+            touchSlop = conf.scaledTouchSlop
+        }
+        init()
+        defaultValue = initDefault()
+        adapter!!.setData(generateAdapterValues(showOnlyFutureDate))
+        currentItemPosition = adapter!!.getItemPosition(defaultValue)
+        selectedItemPosition = currentItemPosition
     }
 }

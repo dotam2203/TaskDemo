@@ -6,7 +6,7 @@ import com.task.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WheelYearPicker(context: Context?, attrs: AttributeSet?) : WheelPicker<String?>(context, attrs){
+class WheelYearPicker(context: Context, attrs: AttributeSet?) : WheelPicker<String?>(context, attrs){
     private var simpleDateFormat: SimpleDateFormat? = null
     @JvmField
     var minYear = 0
@@ -59,7 +59,7 @@ class WheelYearPicker(context: Context?, attrs: AttributeSet?) : WheelPicker<Str
     }
 
     val currentYear: Int
-        get() = convertItemToYear(super.getCurrentItemPosition())
+        get() = convertItemToYear(super.currentItemPosition)
 
     private fun convertItemToYear(itemPosition: Int): Int =  minYear + itemPosition
 

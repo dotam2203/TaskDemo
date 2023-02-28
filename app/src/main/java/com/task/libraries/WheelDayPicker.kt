@@ -16,7 +16,7 @@ class WheelDayPicker(context: Context, attrs: AttributeSet) : WheelPicker<DateWi
 
     override fun init() {}
 
-    override fun setCustomLocale(customLocale: Locale) {
+    override fun setCustomLocale(customLocale: Locale?) {
         super.setCustomLocale(customLocale)
     }
 
@@ -75,7 +75,7 @@ class WheelDayPicker(context: Context, attrs: AttributeSet) : WheelPicker<DateWi
         }
     }
     val currentDate: Date
-        get() = convertItemToDate(super.getCurrentItemPosition())
+        get() = convertItemToDate(super.currentItemPosition)
     private val dateFormat: SimpleDateFormat?
         get() =  if (customDateFormat != null) {
                     customDateFormat
@@ -84,11 +84,11 @@ class WheelDayPicker(context: Context, attrs: AttributeSet) : WheelPicker<DateWi
 
     private fun convertItemToDate(itemPosition: Int): Date {
         val date: Date
-        val itemText = adapter.getItemText(itemPosition)
+        val itemText = adapter!!.getItemText(itemPosition)
         val todayCalendar = Calendar.getInstance()
         todayCalendar.timeZone = dateHelper.getTimeZone()
         var todayPosition = -1
-        val data: List<DateWithLabel> = adapter.data as List<DateWithLabel>
+        val data: List<DateWithLabel> = adapter!!.data as List<DateWithLabel>
         for (i in data.indices) {
             if (data[i].label == todayText) {
                 todayPosition = i
@@ -105,10 +105,10 @@ class WheelDayPicker(context: Context, attrs: AttributeSet) : WheelPicker<DateWi
     }
 
     fun setTodayText(today: DateWithLabel?) {
-        val data: List<DateWithLabel> = adapter.data as List<DateWithLabel>
+        val data: List<DateWithLabel> = adapter?.data as List<DateWithLabel>
         for (i in data.indices) {
             if (data[i].label == todayText) {
-                adapter.data[i] = today
+                adapter!!.data[i] = today
                 notifyDatasetChanged()
             }
         }
