@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".CustomLayout">
+    <RelativeLayout
+        android:id="@+id/rlBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/custom_border">
+
+        <TextView
+            android:id="@+id/tvTitleTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:text="@string/iq3"
+            android:textColor="@color/orange"
+            android:textSize="56sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/llListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="40dp"
+            android:layout_below="@id/tvTitleTop"/>
+
+        <LinearLayout
+            android:id="@+id/llBottom"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_below="@id/llListView"
+            android:background="@drawable/custrom_border_bottom"
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true">
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:text="@string/contact_us"
+                android:background="@drawable/custom_button"
+                android:textColor="@color/orange"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="50dp"
+                android:textSize="20sp"
+                android:layout_gravity="center_vertical"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/money"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
