@@ -15,10 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskDemo"
         tools:targetApi="31">
-        <activity android:name=".MainActivity"
+        <activity android:name=".CustomLayout"
             android:exported="false"/>
         <activity
-            android:name=".CustomLayout"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

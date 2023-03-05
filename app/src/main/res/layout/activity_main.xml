@@ -7,19 +7,20 @@
     tools:context=".MainActivity"
     android:layout_margin="50dp">
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvList"
+        android:id="@+id/recycle_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutBottom"
-        tools:listitem="@layout/item_list"/>
+        app:layout_constraintBottom_toTopOf="@id/linear_bottom"
+        tools:listitem="@layout/parent_item"
+        android:scrollbars="vertical"/>
     <LinearLayout
-        android:id="@+id/layoutBottom"
+        android:id="@+id/linear_bottom"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/rvList"
+        app:layout_constraintTop_toBottomOf="@id/recycle_list"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
