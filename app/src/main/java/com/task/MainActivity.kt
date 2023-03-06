@@ -19,16 +19,7 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     initAdapter()
-    //getEvent()
   }
-
-  /* private fun getEvent() {
-       listItemAdapter.apply {
-           item.addAll(list)
-           diffUtil.submitList(list)
-       }
-   }*/
-
   private fun initAdapter() {
     val list1 = listOf(
       SubList("Full HD video resolution"),
