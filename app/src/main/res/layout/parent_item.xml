@@ -1,73 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraint_parent"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:background="@drawable/custom_border"
-    android:layout_margin="10dp"
-    tools:context=".CustomLayout">
+    xmlns:tools="http://schemas.android.com/tools">
 
-  <TextView
-      android:id="@+id/text_title_top"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:gravity="center"
-      android:text="@string/iq3"
-      android:textColor="@color/orange"
-      android:textSize="56sp"
-      android:textStyle="bold"
-      app:layout_constraintBottom_toTopOf="@id/linear_parent_item"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+  <data>
+    <variable
+        name="item"
+        type="com.task.model.ParentList" />
+  </data>
 
-  <LinearLayout
-      android:id="@+id/linear_parent_item"
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/constraint_parent"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="vertical"
-      app:layout_constraintBottom_toTopOf="@id/linear_bottom"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/text_title_top" >
-    <include
-        layout="@layout/sub_item"/>
-  </LinearLayout>
-
-  <LinearLayout
-      android:id="@+id/linear_bottom"
-      android:layout_width="match_parent"
-      android:layout_height="160dp"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentEnd="true"
-      android:background="@drawable/custom_border_bottom"
-      android:orientation="horizontal"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/linear_parent_item">
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_width="150dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/custom_button"
-        android:text="@string/contact_us"
-        android:textAllCaps="false"
-        android:textColor="@color/orange"
-        android:textSize="20sp" />
+      android:background="@drawable/custom_border"
+      android:layout_margin="10dp"
+      tools:context=".CustomLayout">
 
     <TextView
+        android:id="@+id/text_title_top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="@string/money"
-        android:textColor="@color/white"
-        android:textSize="20sp"/>
-  </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:gravity="center"
+        android:text="@string/iq3"
+        android:textColor="@color/orange"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/linear_parent_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linear_parent_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/linear_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_title_top"/>
+    <LinearLayout
+        android:id="@+id/linear_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/custom_border_bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linear_parent_item">
+
+      <androidx.appcompat.widget.AppCompatButton
+          android:layout_width="150dp"
+          android:layout_height="60dp"
+          android:layout_gravity="center_vertical"
+          android:layout_marginStart="30dp"
+          android:layout_marginEnd="50dp"
+          android:background="@drawable/custom_button"
+          android:text="@string/contact_us"
+          android:textAllCaps="false"
+          android:textColor="@color/orange"
+          android:textSize="20sp" />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_vertical"
+          android:text="@string/money"
+          android:textColor="@color/white"
+          android:textSize="20sp" />
+    </LinearLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

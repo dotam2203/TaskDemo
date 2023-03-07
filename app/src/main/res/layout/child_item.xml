@@ -5,11 +5,11 @@
     <data>
         <variable
             name="item"
-            type="com.task.model.SubList" />
+            type="com.task.model.ParentList" />
     </data>
 
     <LinearLayout
-        android:id="@+id/linear_sub_item"
+        android:id="@+id/linear_child_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -24,7 +24,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_image"
             android:layout_gravity="center_vertical"/>
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
@@ -34,7 +33,6 @@
             android:gravity="left"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:text="@string/title"
             android:lineSpacingExtra="10dp"/>
     </LinearLayout>
 </layout>
