@@ -1,5 +1,6 @@
 package com.task.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,46 +19,31 @@ import com.task.model.ParentList
  * Date: 03/03/2023
  */
 class ListAdapter(private val listItems: List<ParentList>) :
-  RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-  inner class ViewHolder(private val binding: ParentItemBinding) :
-    RecyclerView.ViewHolder(binding.root)
+  RecyclerView.Adapter<ListAdapter.ViewHolder>() {
+  inner class ViewHolder(val binding: ParentItemBinding) : RecyclerView.ViewHolder(binding.root) {}
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val binding = ParentItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     return ViewHolder(binding)
   }
 
   override fun getItemCount(): Int = listItems.size
 
-  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+  @SuppressLint("SetTextI18n")
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val listItem = listItems[position]
-    //holder.bind(listItem)
-    val view1: View =
-      LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
-    val view2: View =
-      LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
-    val view3: View =
-      LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
-    val view4: View =
-      LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
-    val title1 = view1.findViewById<TextView>(R.id.text_title)
-    val title2 = view2.findViewById<TextView>(R.id.text_title)
-    val title3 = view3.findViewById<TextView>(R.id.text_title)
-    val title4 = view4.findViewById<TextView>(R.id.text_title)
-    title1.text = listItem.childList[0].title
-    title2.text = listItem.childList[1].title
-    title3.text = listItem.childList[2].title
-    title4.text = listItem.childList[3].title
-    val parentLayout = holder.itemView.findViewById<LinearLayout>(R.id.linear_parent_item)
-    if (parentLayout.childCount > 0) {
-      parentLayout.removeViewAt(0)
-    }
-    //parentLayout.addView(view1)
-    parentLayout.apply {
-      addView(view1)
-      addView(view2)
-      addView(view3)
-      addView(view4)
+    with(holder) {
+      binding.textTitleTop.text = "IQ${position + 1}"
+      val parentLayout = binding.linearParentItem
+      if (parentLayout.childCount > 0) {
+        parentLayout.removeViewAt(0)
+      }
+      for (i in listItem.childList.indices) {
+        val view: View = LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
+        val title = view.findViewById<TextView>(R.id.text_title)
+        title.text = listItem.childList[i].title
+        parentLayout.addView(view)
+      }
     }
   }
 }

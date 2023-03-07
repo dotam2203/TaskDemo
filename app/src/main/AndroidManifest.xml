@@ -15,8 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskDemo"
         tools:targetApi="31">
-        <activity android:name=".CustomLayout"
-            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
