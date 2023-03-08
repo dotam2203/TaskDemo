@@ -12,38 +12,35 @@ import java.lang.Math.*
  * Date: 07/03/2023
  */
 class DrawShape(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
-    val color1 = ContextCompat.getColor(context,R.color.orange)
-    val cornerRadius = 25f
-    //round
-    val radii = floatArrayOf(
-      0f, 0f,
-      0f,0f,
-      cornerRadius, cornerRadius,
-      cornerRadius, cornerRadius,
-    )
-    // Vẽ hình
-    val path = Path()
+  private val path = Path()
+  private val rectF = RectF()
+  private var radius = 50f
+  private val color1 = ContextCompat.getColor(context, R.color.orange)
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    super.onSizeChanged(w, h, oldw, oldh)
     path.apply {
       moveTo(0f, 0f)
-      lineTo(0f + 7.5f*width/12f,0f)
-      lineTo(0f + 8*width/12f,0f + 1.5f*height/12f)
-      lineTo(0f + 8.5f*width/12f,0f)
+      lineTo(0f + 7.5f * width / 12f, 0f)
+      lineTo(0f + 8 * width / 12f, 0f + 1.5f * height / 12f)
+      lineTo(0f + 8.5f * width / 12f, 0f)
       lineTo(0f + width, 0f)
-      lineTo(0f + width, 0f + height)
-      lineTo(0f, 0f + height)
-      //addRoundRect(RectF(0f + height, 0f + width, 0f + height, 0f + width),radii,Path.Direction.CW)
+      lineTo(0f + width, 0f + 1.5f * height / 12f)
+      lineTo(0f, 0f + 1.5f * height / 12f)
     }
     path.close()
-    val pain = Paint()
-    pain.apply {
+    val rail = floatArrayOf(0f, 0f, 0f, 0f, radius, radius, radius, radius)
+    rectF.set(0f, 0f + 1.5f * height / 12f, 0f + w, 0f + h)
+    path.addRoundRect(rectF, rail, Path.Direction.CW)
+  }
+
+  override fun onDraw(canvas: Canvas?) {
+    super.onDraw(canvas)
+    canvas?.clipPath(path)
+    val paint = Paint()
+    paint.apply {
       style = Paint.Style.FILL_AND_STROKE
       color = color1
-      /*strokeJoin = Paint.Join.ROUND
-      strokeCap = Paint.Cap.ROUND
-      pathEffect = CornerPathEffect(cornerRadius)*/
     }
-    canvas?.drawPath(path,pain)
+    canvas?.drawPath(path, paint)
   }
 }
