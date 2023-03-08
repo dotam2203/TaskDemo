@@ -1,12 +1,12 @@
 package com.task
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.task.adapter.ListAdapter
 import com.task.databinding.ActivityMainBinding
-import com.task.model.ParentList
 import com.task.model.ChildList
+import com.task.model.ParentList
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
@@ -15,15 +15,14 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    getEvent()
-    //initAdapter()
+    initAdapter()
   }
 
-  private fun getEvent() {
+  private fun initAdapter() {
     val items = generateData()
     binding.recycleList.apply {
-        adapter = ListAdapter(items)
-        layoutManager = LinearLayoutManager(this@MainActivity)
+      adapter = ListAdapter(items)
+      layoutManager = LinearLayoutManager(this@MainActivity)
     }
   }
 

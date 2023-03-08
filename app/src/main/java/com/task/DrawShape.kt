@@ -18,19 +18,19 @@ class DrawShape(context: Context, attrs: AttributeSet? = null) : View(context, a
   private val color1 = ContextCompat.getColor(context, R.color.orange)
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
+    val rail = floatArrayOf(0f, 0f, 0f, 0f, radius, radius, radius, radius)
+    rectF.set(0f, 0f + height / 12f, 0f + w, 0f + h)
     path.apply {
       moveTo(0f, 0f)
-      lineTo(0f + 7.5f * width / 12f, 0f)
-      lineTo(0f + 8 * width / 12f, 0f + 1.5f * height / 12f)
-      lineTo(0f + 8.5f * width / 12f, 0f)
+      lineTo(0f + 7.9f * width / 12f, 0f)
+      lineTo(0f + 8.15f * width / 12f, 0f + height / 12f)
+      lineTo(0f + 8.4f * width / 12f, 0f)
       lineTo(0f + width, 0f)
-      lineTo(0f + width, 0f + 1.5f * height / 12f)
-      lineTo(0f, 0f + 1.5f * height / 12f)
+      lineTo(0f + width, 0f + height / 12f)
+      lineTo(0f, 0f + height / 12f)
+      close()
+      addRoundRect(rectF, rail, Path.Direction.CW)
     }
-    path.close()
-    val rail = floatArrayOf(0f, 0f, 0f, 0f, radius, radius, radius, radius)
-    rectF.set(0f, 0f + 1.5f * height / 12f, 0f + w, 0f + h)
-    path.addRoundRect(rectF, rail, Path.Direction.CW)
   }
 
   override fun onDraw(canvas: Canvas?) {

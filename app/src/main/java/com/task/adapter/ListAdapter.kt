@@ -4,14 +4,10 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
-import com.task.databinding.ChildItemBinding
 import com.task.databinding.ParentItemBinding
-import com.task.model.ChildList
 import com.task.model.ParentList
 
 /**
@@ -39,7 +35,8 @@ class ListAdapter(private val listItems: List<ParentList>) :
         parentLayout.removeViewAt(0)
       }
       for (i in listItem.childList.indices) {
-        val view: View = LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
+        val view: View =
+          LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
         val title = view.findViewById<TextView>(R.id.text_title)
         title.text = listItem.childList[i].title
         parentLayout.addView(view)
