@@ -1,10 +1,12 @@
 package com.task.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
 import com.task.databinding.ParentItem2Binding
@@ -19,8 +21,11 @@ import com.task.model.ParentList
 class ListAdapter(private val listItems: List<ParentList>) :
   RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   inner class ViewHolder(val binding: ParentItemBinding) : RecyclerView.ViewHolder(binding.root) {}
-  inner class ViewHolder2(val binding: ParentItem2Binding) : RecyclerView.ViewHolder(binding.root) {}
-  inner class ViewHolderChoose(val binding: TypeChooseBinding) : RecyclerView.ViewHolder(binding.root) {}
+  inner class ViewHolder2(val binding: ParentItem2Binding) :
+    RecyclerView.ViewHolder(binding.root) {}
+
+  inner class ViewHolderChoose(val binding: TypeChooseBinding) :
+    RecyclerView.ViewHolder(binding.root) {}
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     return when (viewType) {
@@ -32,7 +37,7 @@ class ListAdapter(private val listItems: List<ParentList>) :
         val binding = ParentItem2Binding.inflate(LayoutInflater.from(parent.context), parent, false)
         ViewHolder2(binding)
       }
-      TYPE_CHOOSE ->{
+      TYPE_CHOOSE -> {
         val binding = TypeChooseBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         ViewHolderChoose(binding)
       }
@@ -67,15 +72,18 @@ class ListAdapter(private val listItems: List<ParentList>) :
 
   override fun getItemCount(): Int = listItems.size
   override fun getItemViewType(position: Int): Int {
-    return if (position % 2 == 0) {
-      if(position == 0)
-        TYPE_CHOOSE
-      else
-        TYPE_PARENT1
-    } else {
-      TYPE_PARENT2
+    return when (position) {
+      0 -> TYPE_CHOOSE
+      1, 2 -> TYPE_PARENT2
+      else -> TYPE_PARENT1
     }
+  }
 
+  fun spanSizeLookup(position: Int): Int {
+    return when (position) {
+      1, 2 -> 1
+      else -> 2
+    }
   }
 
   companion object {
@@ -83,4 +91,11 @@ class ListAdapter(private val listItems: List<ParentList>) :
     private const val TYPE_PARENT2 = 2
     private const val TYPE_CHOOSE = 3
   }
+}
+
+class GridSpanSizeLookup(private val adapter: ListAdapter) : GridLayoutManager.SpanSizeLookup() {
+  override fun getSpanSize(position: Int): Int {
+    return adapter.spanSizeLookup(position)
+  }
+
 }
