@@ -18,7 +18,7 @@ import com.task.model.ParentList
  * Author: tamdt35@fpt.com.vn
  * Date: 03/03/2023
  */
-class ListAdapter(private val listItems: ArrayList<ParentList.DescriptionItem2>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ListAdapter(private val listItems: ParentList.DescriptionItemChild) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   inner class ViewHolder(val binding: ParentItemBinding) : RecyclerView.ViewHolder(binding.root) {}
   inner class ViewHolder2(val binding: ParentItem2Binding) : RecyclerView.ViewHolder(binding.root) {}
   inner class ViewHolderChoose(val binding: TypeChooseBinding) : RecyclerView.ViewHolder(binding.root) {}
@@ -51,10 +51,10 @@ class ListAdapter(private val listItems: ArrayList<ParentList.DescriptionItem2>)
           parentLayout.removeViewAt(0)
         }
         //tránh lặp lại view
-        for (item in listItems.slice(0..3)) {
+        for (item in listItems.description.slice(0..3)) {
           val view: View = LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
           val title = view.findViewById<TextView>(R.id.text_title)
-          title.text = item.description
+          title.text = item.toString()
           parentLayout.addView(view)
         }
       }
@@ -62,7 +62,8 @@ class ListAdapter(private val listItems: ArrayList<ParentList.DescriptionItem2>)
         binding.textTitleTop.text = "IQ$position"
       }
       is ViewHolderChoose -> holder.apply {
-        binding.textChoose.text = ParentList.TitleChoose.toString()
+        val title = ParentList.TitleChoose("What would you \nlike to choose?")
+        binding.textChoose.text = title.title
       }
     }
   }

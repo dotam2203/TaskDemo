@@ -19,25 +19,21 @@ class MainActivity : AppCompatActivity() {
 
   private fun initAdapter() {
     val items = generateData()
-    val _layoutManager = GridLayoutManager(this@MainActivity, 2)
-    _layoutManager.spanSizeLookup = GridSpanSizeLookup(ListAdapter(items))
+    val layoutManager1 = GridLayoutManager(this@MainActivity, 2)
+    layoutManager1.spanSizeLookup = GridSpanSizeLookup(ListAdapter(items))
     binding.recycleList.apply {
       adapter = ListAdapter(items)
-      layoutManager = _layoutManager
+      layoutManager = layoutManager1
     }
   }
 
-  private fun generateData(): ArrayList<ParentList.DescriptionItem2> {
-    val list = listOf(
-      "Full HD video resolution",
-      "3-day event-based cloud video storage",
-      "Al feature (human detection)",
-      "No-cost maintenance and 24/7 support services"
-    )
-    val items = ArrayList<ParentList.DescriptionItem2>()
-    for (i in list.indices) {
-      items.addAll(listOf(ParentList.DescriptionItem2(list[i])))
+  private fun generateData(): ParentList.DescriptionItemChild {
+    val list = ParentList.DescriptionItemChild(arrayListOf()).description.apply {
+      add("Full HD video resolution")
+      add("3-day event-based cloud video storage")
+      add("Al feature (human detection)")
+      add("No-cost maintenance and 24/7 support services")
     }
-    return items
+    return ParentList.DescriptionItemChild(list)
   }
 }
