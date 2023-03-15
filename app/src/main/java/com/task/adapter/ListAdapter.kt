@@ -18,14 +18,10 @@ import com.task.model.ParentList
  * Author: tamdt35@fpt.com.vn
  * Date: 03/03/2023
  */
-class ListAdapter(private val listItems: List<ParentList>) :
-  RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ListAdapter(private val listItems: ArrayList<ParentList>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   inner class ViewHolder(val binding: ParentItemBinding) : RecyclerView.ViewHolder(binding.root) {}
-  inner class ViewHolder2(val binding: ParentItem2Binding) :
-    RecyclerView.ViewHolder(binding.root) {}
-
-  inner class ViewHolderChoose(val binding: TypeChooseBinding) :
-    RecyclerView.ViewHolder(binding.root) {}
+  inner class ViewHolder2(val binding: ParentItem2Binding) : RecyclerView.ViewHolder(binding.root) {}
+  inner class ViewHolderChoose(val binding: TypeChooseBinding) : RecyclerView.ViewHolder(binding.root) {}
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     return when (viewType) {
@@ -47,30 +43,33 @@ class ListAdapter(private val listItems: List<ParentList>) :
 
   @SuppressLint("SetTextI18n")
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-    val listItem = listItems[position]
     when (holder) {
-      //is ViewHolderChoose -> holder.apply {  }
       is ViewHolder -> holder.apply {
         binding.textTitleTop.text = "IQ$position"
         val parentLayout = binding.linearParentItem
         if (parentLayout.childCount > 0) {
           parentLayout.removeViewAt(0)
         }
-        for (i in listItem.childList.indices) {
-          val view: View =
-            LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
-          val title = view.findViewById<TextView>(R.id.text_title)
-          title.text = listItem.childList[i].title
-          parentLayout.addView(view)
+        //lấy 4 phần tử đầu mảng
+        for (item in listItems.slice(1..4)) {
+          if (item is ParentList.TitleModel) {
+            val view: View = LayoutInflater.from(holder.itemView.context).inflate(R.layout.child_item, null)
+            val title = view.findViewById<TextView>(R.id.text_title)
+            title.text = item.title
+            parentLayout.addView(view)
+          }
         }
       }
       is ViewHolder2 -> holder.apply {
         binding.textTitleTop.text = "IQ$position"
       }
+      is ViewHolderChoose -> holder.apply {
+        binding.textChoose.text = (listItems.first() as ParentList.TitleModel).title
+      }
     }
   }
 
-  override fun getItemCount(): Int = listItems.size
+  override fun getItemCount(): Int = 10
   override fun getItemViewType(position: Int): Int {
     return when (position) {
       0 -> TYPE_CHOOSE
@@ -97,5 +96,4 @@ class GridSpanSizeLookup(private val adapter: ListAdapter) : GridLayoutManager.S
   override fun getSpanSize(position: Int): Int {
     return adapter.spanSizeLookup(position)
   }
-
 }
