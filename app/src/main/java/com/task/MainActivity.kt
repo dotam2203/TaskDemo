@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun initAdapter() {
-    val items = generateData() as ArrayList<ParentList>
+    val items = generateData()
     val _layoutManager = GridLayoutManager(this@MainActivity, 2)
     _layoutManager.spanSizeLookup = GridSpanSizeLookup(ListAdapter(items))
     binding.recycleList.apply {
@@ -27,18 +27,17 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun generateData(): List<ParentList> {
+  private fun generateData(): ArrayList<ParentList.DescriptionItem2> {
     val list = listOf(
-      "What would you \nlike to choose?",
       "Full HD video resolution",
       "3-day event-based cloud video storage",
       "Al feature (human detection)",
       "No-cost maintenance and 24/7 support services"
     )
-    val titles = ArrayList<ParentList>()
+    val items = ArrayList<ParentList.DescriptionItem2>()
     for (i in list.indices) {
-      titles.addAll(listOf(ParentList.TitleModel(list[i])))
+      items.addAll(listOf(ParentList.DescriptionItem2(list[i])))
     }
-    return titles
+    return items
   }
 }

@@ -7,7 +7,13 @@ import android.view.View
  * Date: 02/03/2023
  */
 sealed class ParentList{
-  data class TitleModel(var title: String): ParentList()
+  object TitleChoose : ParentList(){
+    override fun toString(): String {
+      return "What would you \nlike to choose?"
+    }
+  }
+  data class DescriptionItem1(var url: String, var imageUrl: String): ParentList()
+  data class DescriptionItem2(var description: String): ParentList()
 }
 
 
