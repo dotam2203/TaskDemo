@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.task.adapter.GridSpanSizeLookup
-import com.task.adapter.ListAdapter
+import com.task.adapter.RecyclerAdapter
 import com.task.databinding.ActivityMainBinding
 import com.task.model.ParentList
 
@@ -19,11 +19,11 @@ class MainActivity : AppCompatActivity() {
 
   private fun initAdapter() {
     val items = generateData()
-    val layoutManager1 = GridLayoutManager(this@MainActivity, 2)
-    layoutManager1.spanSizeLookup = GridSpanSizeLookup(ListAdapter(items))
+    val layoutManagerGrid = GridLayoutManager(this@MainActivity, 2)
+    layoutManagerGrid.spanSizeLookup = GridSpanSizeLookup(RecyclerAdapter(items))
     binding.recycleList.apply {
-      adapter = ListAdapter(items)
-      layoutManager = layoutManager1
+      adapter = RecyclerAdapter(items)
+      layoutManager = layoutManagerGrid
     }
   }
 
