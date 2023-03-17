@@ -37,6 +37,7 @@
         android:textSize="24sp"
         android:textStyle="bold"/>
       <androidx.appcompat.widget.AppCompatButton
+          android:id="@+id/button_apply"
           android:layout_width="100dp"
           android:layout_height="50dp"
           android:background="@drawable/custom_border"

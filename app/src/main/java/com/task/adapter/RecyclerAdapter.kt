@@ -1,10 +1,12 @@
 package com.task.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
@@ -17,34 +19,51 @@ import com.task.model.ParentList
  * Author: tamdt35@fpt.com.vn
  * Date: 03/03/2023
  */
-class RecyclerAdapter(private val listItems: ParentList.DescriptionItemChild) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class RecyclerAdapter(
+  private val context: Context,
+  private val listItems: ArrayList<ParentList>,
+  private val listener: OnClickItemRecyclerView
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   inner class ViewHolderChoose(val binding: LayoutItem1Binding) : RecyclerView.ViewHolder(binding.root) {
-    fun bin(position: Int){
-      val title = ParentList.TitleChoose("What would you \nlike to choose?")
-      binding.textChoose.text = title.title
+    fun bin(position: Int) {
+      val item = listItems[position]
+      if(item is ParentList.TitleChoose){
+        binding.textChoose.text = item.title
+      }
     }
   }
+
   inner class ViewHolderCard(val binding: LayoutItem2Binding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int){
+    fun bin(position: Int) {
       binding.textTitleTop.text = "IQ$position"
     }
+
+    fun onClickItemCard(position: Int) {
+      listener.itemClick(listItems[position])
+    }
   }
+
   inner class ViewHolderNestedList(val binding: LayoutItem3Binding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int){
+    fun bin(position: Int) {
       binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
-      if (parentLayout.childCount > 0) {
-        parentLayout.removeViewAt(0)
+
+      if (parentLayout.childCount == 0) {
+        for (item in listItems) {
+          if (item is ParentList.DescriptionItemChild) {
+            val view: View = LayoutInflater.from(itemView.context).inflate(R.layout.description_layout, null)
+            val title = view.findViewById<TextView>(R.id.text_title)
+            title.text = item.description
+            parentLayout.addView(view)
+          }
+        }
       }
-      //tránh lặp lại view
-      for (item in listItems.description.slice(0..3)) {
-        val view: View = LayoutInflater.from(itemView.context).inflate(R.layout.description_layout, null)
-        val title = view.findViewById<TextView>(R.id.text_title)
-        title.text = item.toString()
-        parentLayout.addView(view)
-      }
+    }
+
+    fun onClickItemNested(position: Int) {
+      listener.itemClick(listItems[position])
     }
   }
 
@@ -101,10 +120,13 @@ class RecyclerAdapter(private val listItems: ParentList.DescriptionItemChild) : 
     private const val TYPE_LAYOUT2 = 2
     private const val TYPE_LAYOUT3 = 3
   }
+  interface OnClickItemRecyclerView {
+    fun itemClick(data: ParentList)
+  }
 }
-
 class GridSpanSizeLookup(private val adapter: RecyclerAdapter) : GridLayoutManager.SpanSizeLookup() {
   override fun getSpanSize(position: Int): Int {
     return adapter.spanSizeLookup(position)
   }
 }
+
