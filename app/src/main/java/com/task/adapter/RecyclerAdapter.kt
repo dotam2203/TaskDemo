@@ -1,18 +1,19 @@
 package com.task.adapter
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
-import com.task.databinding.LayoutItem1Binding
-import com.task.databinding.LayoutItem2Binding
-import com.task.databinding.LayoutItem3Binding
+import com.task.databinding.LayoutItemChooseBinding
+import com.task.databinding.LayoutItemCardBinding
+import com.task.databinding.LayoutItemNestedBinding
 import com.task.model.ParentList
 
 /**
@@ -24,7 +25,7 @@ class RecyclerAdapter(
   private val listItems: ArrayList<ParentList>,
   private val listener: OnClickItemRecyclerView
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-  inner class ViewHolderChoose(val binding: LayoutItem1Binding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin(position: Int) {
       val item = listItems[position]
       if(item is ParentList.TitleChoose){
@@ -33,7 +34,7 @@ class RecyclerAdapter(
     }
   }
 
-  inner class ViewHolderCard(val binding: LayoutItem2Binding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderCard(val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int) {
       binding.textTitleTop.text = "IQ$position"
@@ -44,9 +45,9 @@ class RecyclerAdapter(
     }
   }
 
-  inner class ViewHolderNestedList(val binding: LayoutItem3Binding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderNestedList(val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int) {
+    fun bin(position: Int, data: ParentList) {
       binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
 
@@ -60,25 +61,24 @@ class RecyclerAdapter(
           }
         }
       }
-    }
-
-    fun onClickItemNested(position: Int) {
-      listener.itemClick(listItems[position])
+      binding.constraintParent.setOnClickListener {
+        listener.itemClick(data)
+      }
     }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     return when (viewType) {
-      TYPE_LAYOUT1 -> {
-        val binding = LayoutItem1Binding.inflate(LayoutInflater.from(parent.context), parent, false)
+      TYPE_LAYOUT_CHOOSE -> {
+        val binding = LayoutItemChooseBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         ViewHolderChoose(binding)
       }
-      TYPE_LAYOUT2 -> {
-        val binding = LayoutItem2Binding.inflate(LayoutInflater.from(parent.context), parent, false)
+      TYPE_LAYOUT_CARD -> {
+        val binding = LayoutItemCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         ViewHolderCard(binding)
       }
-      TYPE_LAYOUT3 -> {
-        val binding = LayoutItem3Binding.inflate(LayoutInflater.from(parent.context), parent, false)
+      TYPE_LAYOUT_NESTED -> {
+        val binding = LayoutItemNestedBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         ViewHolderNestedList(binding)
       }
       else -> throw IllegalArgumentException("Invalid view holder")
@@ -86,9 +86,10 @@ class RecyclerAdapter(
   }
 
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    val data = listItems[position]
     when (holder) {
       is ViewHolderNestedList -> holder.apply {
-        bin(position)
+        bin(position,data as ParentList.DescriptionItemChild)
       }
       is ViewHolderCard -> holder.apply {
         bin(position)
@@ -102,9 +103,9 @@ class RecyclerAdapter(
   override fun getItemCount(): Int = 10
   override fun getItemViewType(position: Int): Int {
     return when (position) {
-      0 -> TYPE_LAYOUT1
-      1, 2 -> TYPE_LAYOUT2
-      else -> TYPE_LAYOUT3
+      0 -> TYPE_LAYOUT_CHOOSE
+      1, 2 -> TYPE_LAYOUT_CARD
+      else -> TYPE_LAYOUT_NESTED
     }
   }
 
@@ -116,9 +117,9 @@ class RecyclerAdapter(
   }
 
   companion object {
-    private const val TYPE_LAYOUT1 = 1
-    private const val TYPE_LAYOUT2 = 2
-    private const val TYPE_LAYOUT3 = 3
+    private const val TYPE_LAYOUT_CHOOSE = 1
+    private const val TYPE_LAYOUT_CARD = 2
+    private const val TYPE_LAYOUT_NESTED = 3
   }
   interface OnClickItemRecyclerView {
     fun itemClick(data: ParentList)

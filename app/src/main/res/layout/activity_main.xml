@@ -14,6 +14,6 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      tools:listitem="@layout/layout_item3" />
+      tools:listitem="@layout/layout_item_nested" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,15 @@
 package com.task
 
+import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
+import android.view.Window
+import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -48,6 +56,29 @@ class MainActivity : AppCompatActivity(), RecyclerAdapter.OnClickItemRecyclerVie
   }
 
   override fun itemClick(data: ParentList) {
-    TODO("Not yet implemented")
+    if(data is ParentList.DescriptionItemChild){
+      dialogString(data.description)
+      Toast.makeText(this, data.description, Toast.LENGTH_LONG).show()
+    }
+  }
+  fun dialogString(msg: String){
+    val dialog = Dialog(this)
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    dialog.setContentView(R.layout.dialog_data)
+
+    val window: Window? = dialog.window
+    window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+    val windowAtrributes : WindowManager.LayoutParams = window!!.attributes
+    windowAtrributes.gravity = Gravity.CENTER
+    window.attributes = windowAtrributes
+    //click ra bên ngoài để tắt dialog
+    //false = no; true = yes
+    dialog.setCancelable(true)
+    dialog.show()
+    val text: TextView = dialog.findViewById(R.id.text_data)
+    text.text = msg
+    //dialog.dismiss()
   }
 }
