@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
   private fun initAdapter() {
     val items = generateData()
     binding.recycleList.apply {
-      adapter = RecyclerAdapter(items){item, layoutType ->
+      adapter = RecyclerAdapter(items){item, position, layoutType ->
         when(layoutType){
           TYPE_LAYOUT_CARD -> {
             val data = item as ParentList.DescriptionItem
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
               }
             }
             //ngắt chuỗi
-            dialogDataShow(listData.joinToString("\n"))
+            dialogDataShow("$position\n${listData.joinToString("\n")}")
             //Toast.makeText(this@MainActivity, "onclick Nested - position ${listData.size}", Toast.LENGTH_SHORT).show()
           }
         }

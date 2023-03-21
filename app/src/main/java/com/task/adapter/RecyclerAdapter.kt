@@ -20,26 +20,29 @@ import com.task.model.ParentList
  */
 class RecyclerAdapter(
   private val listItems: ArrayList<ParentList>,
-  private var onItemClick: ((item: ParentList, layoutType: Int) -> Unit)) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  private var onItemClick: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bin(position: Int){
+    fun bin(position: Int) {
       val title = ParentList.TitleChoose("What would you \nlike to choose?")
       binding.textChoose.text = title.title
     }
   }
+
   inner class ViewHolderCard(val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int ,layoutType: Int){
+    fun bin(position: Int, layoutType: Int) {
       binding.textTitleTop.text = "IQ$position"
       binding.cardParent.setOnClickListener {
-        onItemClick.invoke(listItems[position],layoutType)
+        onItemClick.invoke(listItems[position], position, layoutType)
       }
     }
   }
+
   inner class ViewHolderNestedList(val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int, layoutType: Int){
+    fun bin(position: Int, layoutType: Int) {
       binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
@@ -53,7 +56,7 @@ class RecyclerAdapter(
         }
       }
       binding.constraintParent.setOnClickListener {
-        onItemClick.invoke(listItems[position],layoutType)
+        onItemClick.invoke(listItems[position], position, layoutType)
       }
     }
   }
@@ -81,7 +84,7 @@ class RecyclerAdapter(
     val layoutType = getItemViewType(position)
     when (holder) {
       is ViewHolderNestedList -> holder.apply {
-        bin(position,layoutType)
+        bin(position, layoutType)
       }
       is ViewHolderCard -> holder.apply {
         bin(position, layoutType)
