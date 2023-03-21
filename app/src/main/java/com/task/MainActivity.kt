@@ -33,11 +33,20 @@ class MainActivity : AppCompatActivity() {
       adapter = RecyclerAdapter(items){item, layoutType ->
         when(layoutType){
           TYPE_LAYOUT_CARD -> {
-            val value =
-            Toast.makeText(this@MainActivity, "onclick Card - position $item", Toast.LENGTH_SHORT).show()
+            val data = item as ParentList.DescriptionItem
+            dialogDataShow("${data.value}\n${data.name}")
+            //Toast.makeText(this@MainActivity, "onclick Card - position ${data.value}", Toast.LENGTH_SHORT).show()
           }
           TYPE_LAYOUT_NESTED -> {
-            Toast.makeText(this@MainActivity, "onclick Nested - position $item", Toast.LENGTH_SHORT).show()
+            val listData = arrayListOf<String>()
+            for(data in items.slice(3..6)){
+              if(data is ParentList.DescriptionItemChild){
+                listData.addAll(listOf(data.description))
+              }
+            }
+            //ngắt chuỗi
+            dialogDataShow(listData.joinToString("\n"))
+            //Toast.makeText(this@MainActivity, "onclick Nested - position ${listData.size}", Toast.LENGTH_SHORT).show()
           }
         }
       }
@@ -69,7 +78,7 @@ class MainActivity : AppCompatActivity() {
     list.add(view4)
     return list
   }
-  fun dialogString(msg: String){
+  fun dialogDataShow(msg: String){
     val dialog = Dialog(this)
     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
     dialog.setContentView(R.layout.dialog_data)
