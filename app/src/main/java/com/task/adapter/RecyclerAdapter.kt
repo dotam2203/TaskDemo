@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ import com.task.model.ParentList
  * Date: 03/03/2023
  */
 class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  var onItemClick: ((item: ParentList, layoutType: Int) -> Unit)? = null
   inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin(position: Int){
       val title = ParentList.TitleChoose("What would you \nlike to choose?")
@@ -26,13 +28,16 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
   }
   inner class ViewHolderCard(val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int){
+    fun bin(position: Int ,layoutType: Int){
       binding.textTitleTop.text = "IQ$position"
+      binding.cardParent.setOnClickListener {
+        onItemClick?.invoke(listItems[position],layoutType)
+      }
     }
   }
   inner class ViewHolderNestedList(val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int){
+    fun bin(position: Int, layoutType: Int){
       binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
@@ -44,6 +49,9 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
             parentLayout.addView(view)
           }
         }
+      }
+      binding.constraintParent.setOnClickListener {
+        onItemClick?.invoke(listItems[position],layoutType)
       }
     }
   }
@@ -67,12 +75,14 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
   }
 
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    val item = listItems[position]
+    val layoutType = getItemViewType(position)
     when (holder) {
       is ViewHolderNestedList -> holder.apply {
-        bin(position)
+        bin(position,layoutType)
       }
       is ViewHolderCard -> holder.apply {
-        bin(position)
+        bin(position, layoutType)
       }
       is ViewHolderChoose -> holder.apply {
         bin(position)
@@ -80,7 +90,7 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
     }
   }
 
-  override fun getItemCount(): Int = 10
+  override fun getItemCount(): Int = listItems.size
   override fun getItemViewType(position: Int): Int {
     return when (position) {
       0 -> TYPE_LAYOUT_CHOOSE
@@ -101,6 +111,22 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
     private const val TYPE_LAYOUT_CARD = 2
     private const val TYPE_LAYOUT_NESTED = 3
   }
+  //sử dụng high-order bắt sự kiện click item
+  /*fun RecyclerView.addOnItemClickListener(onClickListener: (position: Int) -> Unit){
+    this.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+      override fun onChildViewAttachedToWindow(view: View) {
+        view.setOnClickListener(null)
+      }
+
+      override fun onChildViewDetachedFromWindow(view: View) {
+        view.setOnClickListener {
+          val holder = getChildViewHolder(view)
+          onClickListener.invoke(holder.adapterPosition)
+        }
+      }
+
+    })
+  }*/
 }
 
 class GridSpanSizeLookup(private val adapter: RecyclerAdapter) : GridLayoutManager.SpanSizeLookup() {

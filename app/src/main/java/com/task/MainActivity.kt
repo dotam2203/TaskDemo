@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.task.adapter.GridSpanSizeLookup
@@ -29,7 +30,18 @@ class MainActivity : AppCompatActivity() {
     val layoutManagerGrid = GridLayoutManager(this@MainActivity, 2)
     layoutManagerGrid.spanSizeLookup = GridSpanSizeLookup(RecyclerAdapter(items))
     binding.recycleList.apply {
-      adapter = RecyclerAdapter(items)
+      val _adapter = RecyclerAdapter(items)
+      adapter = _adapter
+      _adapter.onItemClick = { item, layoutType ->
+        when(layoutType){
+          R.layout.layout_item_card -> {
+            Toast.makeText(this@MainActivity, "onclick Card", Toast.LENGTH_SHORT).show()
+          }
+          R.layout.layout_item_nested -> {
+            Toast.makeText(this@MainActivity, "onclick Nested", Toast.LENGTH_SHORT).show()
+          }
+        }
+      }
       layoutManager = layoutManagerGrid
     }
   }
