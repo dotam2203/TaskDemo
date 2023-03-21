@@ -20,7 +20,7 @@ import com.task.model.ParentList
  */
 class RecyclerAdapter(
   private val listItems: ArrayList<ParentList>,
-  private var onItemClick: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
+  private val onItemClick: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {

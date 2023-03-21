@@ -30,8 +30,8 @@ class MainActivity : AppCompatActivity() {
   private fun initAdapter() {
     val items = generateData()
     binding.recycleList.apply {
-      adapter = RecyclerAdapter(items){item, position, layoutType ->
-        when(layoutType){
+      adapter = RecyclerAdapter(items) { item, position, layoutType ->
+        when (layoutType) {
           TYPE_LAYOUT_CARD -> {
             val data = item as ParentList.DescriptionItem
             dialogDataShow("${data.value}\n${data.name}")
@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity() {
           }
           TYPE_LAYOUT_NESTED -> {
             val listData = arrayListOf<String>()
-            for(data in items.slice(3..6)){
-              if(data is ParentList.DescriptionItemChild){
+            for (data in items.slice(3..6)) {
+              if (data is ParentList.DescriptionItemChild) {
                 listData.addAll(listOf(data.description))
               }
             }
@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity() {
     //data TitleChoose
     val title = ParentList.TitleChoose("What would you \nlike to choose?")
     //data DescriptionItem
-    val data1 = ParentList.DescriptionItem(1,"Đỗ Tâm")
-    val data2 = ParentList.DescriptionItem(2,"Lê Đỗ")
+    val data1 = ParentList.DescriptionItem(1, "Đỗ Tâm")
+    val data2 = ParentList.DescriptionItem(2, "Lê Đỗ")
     //data DescriptionItemChild
     val view1 = ParentList.DescriptionItemChild("Full HD video resolution")
     val view2 = ParentList.DescriptionItemChild("3-day event-based cloud video storage")
@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
     list.add(view4)
     return list
   }
-  fun dialogDataShow(msg: String){
+
+  fun dialogDataShow(msg: String) {
     val dialog = Dialog(this)
     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
     dialog.setContentView(R.layout.dialog_data)
@@ -87,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
     window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-    val windowAtrributes : WindowManager.LayoutParams = window!!.attributes
+    val windowAtrributes: WindowManager.LayoutParams = window!!.attributes
     windowAtrributes.gravity = Gravity.CENTER
     window.attributes = windowAtrributes
     //click ra bên ngoài để tắt dialog
