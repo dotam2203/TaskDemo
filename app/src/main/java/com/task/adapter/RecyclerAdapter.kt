@@ -18,8 +18,10 @@ import com.task.model.ParentList
  * Author: tamdt35@fpt.com.vn
  * Date: 03/03/2023
  */
-class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-  var onItemClick: ((item: ParentList, layoutType: Int) -> Unit)? = null
+class RecyclerAdapter(
+  private val listItems: ArrayList<ParentList>,
+  private var onItemClick: ((item: ParentList, layoutType: Int) -> Unit)) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
   inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin(position: Int){
       val title = ParentList.TitleChoose("What would you \nlike to choose?")
@@ -31,7 +33,7 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
     fun bin(position: Int ,layoutType: Int){
       binding.textTitleTop.text = "IQ$position"
       binding.cardParent.setOnClickListener {
-        onItemClick?.invoke(listItems[position],layoutType)
+        onItemClick.invoke(listItems[position],layoutType)
       }
     }
   }
@@ -41,17 +43,17 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
       binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
-        for (item in listItems) {
-          if (item is ParentList.DescriptionItemChild) {
+        for (i in listItems) {
+          if (i is ParentList.DescriptionItemChild) {
             val view: View = LayoutInflater.from(itemView.context).inflate(R.layout.description_layout, null)
             val title = view.findViewById<TextView>(R.id.text_title)
-            title.text = item.description
+            title.text = i.description
             parentLayout.addView(view)
           }
         }
       }
       binding.constraintParent.setOnClickListener {
-        onItemClick?.invoke(listItems[position],layoutType)
+        onItemClick.invoke(listItems[position],layoutType)
       }
     }
   }
@@ -107,9 +109,9 @@ class RecyclerAdapter(private val listItems: ArrayList<ParentList>) : RecyclerVi
   }
 
   companion object {
-    private const val TYPE_LAYOUT_CHOOSE = 1
-    private const val TYPE_LAYOUT_CARD = 2
-    private const val TYPE_LAYOUT_NESTED = 3
+    const val TYPE_LAYOUT_CHOOSE = 1
+    const val TYPE_LAYOUT_CARD = 2
+    const val TYPE_LAYOUT_NESTED = 3
   }
   //sử dụng high-order bắt sự kiện click item
   /*fun RecyclerView.addOnItemClickListener(onClickListener: (position: Int) -> Unit){

@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.task.adapter.GridSpanSizeLookup
 import com.task.adapter.RecyclerAdapter
+import com.task.adapter.RecyclerAdapter.Companion.TYPE_LAYOUT_CARD
+import com.task.adapter.RecyclerAdapter.Companion.TYPE_LAYOUT_NESTED
 import com.task.databinding.ActivityMainBinding
 import com.task.model.ParentList
 
@@ -27,21 +29,20 @@ class MainActivity : AppCompatActivity() {
 
   private fun initAdapter() {
     val items = generateData()
-    val layoutManagerGrid = GridLayoutManager(this@MainActivity, 2)
-    layoutManagerGrid.spanSizeLookup = GridSpanSizeLookup(RecyclerAdapter(items))
     binding.recycleList.apply {
-      val _adapter = RecyclerAdapter(items)
-      adapter = _adapter
-      _adapter.onItemClick = { item, layoutType ->
+      adapter = RecyclerAdapter(items){item, layoutType ->
         when(layoutType){
-          R.layout.layout_item_card -> {
-            Toast.makeText(this@MainActivity, "onclick Card", Toast.LENGTH_SHORT).show()
+          TYPE_LAYOUT_CARD -> {
+            val value =
+            Toast.makeText(this@MainActivity, "onclick Card - position $item", Toast.LENGTH_SHORT).show()
           }
-          R.layout.layout_item_nested -> {
-            Toast.makeText(this@MainActivity, "onclick Nested", Toast.LENGTH_SHORT).show()
+          TYPE_LAYOUT_NESTED -> {
+            Toast.makeText(this@MainActivity, "onclick Nested - position $item", Toast.LENGTH_SHORT).show()
           }
         }
       }
+      val layoutManagerGrid = GridLayoutManager(this@MainActivity, 2)
+      layoutManagerGrid.spanSizeLookup = GridSpanSizeLookup(adapter = adapter as RecyclerAdapter)
       layoutManager = layoutManagerGrid
     }
   }
@@ -50,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     val list = ArrayList<ParentList>()
     //data TitleChoose
     val title = ParentList.TitleChoose("What would you \nlike to choose?")
+    //data DescriptionItem
+    val data1 = ParentList.DescriptionItem(1,"Đỗ Tâm")
+    val data2 = ParentList.DescriptionItem(2,"Lê Đỗ")
     //data DescriptionItemChild
     val view1 = ParentList.DescriptionItemChild("Full HD video resolution")
     val view2 = ParentList.DescriptionItemChild("3-day event-based cloud video storage")
@@ -57,6 +61,8 @@ class MainActivity : AppCompatActivity() {
     val view4 = ParentList.DescriptionItemChild("No-cost maintenance and 24/7 support services")
     //add list
     list.add(title)
+    list.add(data1)
+    list.add(data2)
     list.add(view1)
     list.add(view2)
     list.add(view3)
