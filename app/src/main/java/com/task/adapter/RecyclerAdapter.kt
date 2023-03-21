@@ -83,32 +83,22 @@ class RecyclerAdapter(
     val item = listItems[position]
     val layoutType = getItemViewType(position)
     when (holder) {
-      is ViewHolderNestedList -> holder.apply {
-        bin(position, layoutType)
-      }
-      is ViewHolderCard -> holder.apply {
-        bin(position, layoutType)
-      }
-      is ViewHolderChoose -> holder.apply {
-        bin(position)
-      }
+      is ViewHolderNestedList -> holder.bin(position, layoutType)
+      is ViewHolderCard -> holder.bin(position, layoutType)
+      is ViewHolderChoose -> holder.bin(position)
     }
   }
 
   override fun getItemCount(): Int = listItems.size
-  override fun getItemViewType(position: Int): Int {
-    return when (position) {
-      0 -> TYPE_LAYOUT_CHOOSE
-      1, 2 -> TYPE_LAYOUT_CARD
-      else -> TYPE_LAYOUT_NESTED
-    }
+  override fun getItemViewType(position: Int) = when (position) {
+    0 -> TYPE_LAYOUT_CHOOSE
+    1, 2 -> TYPE_LAYOUT_CARD
+    else -> TYPE_LAYOUT_NESTED
   }
 
-  fun spanSizeLookup(position: Int): Int {
-    return when (position) {
-      1, 2 -> 1
-      else -> 2
-    }
+  fun spanSizeLookup(position: Int) = when (position) {
+    1, 2 -> 1
+    else -> 2
   }
 
   companion object {
@@ -116,26 +106,8 @@ class RecyclerAdapter(
     const val TYPE_LAYOUT_CARD = 2
     const val TYPE_LAYOUT_NESTED = 3
   }
-  //sử dụng high-order bắt sự kiện click item
-  /*fun RecyclerView.addOnItemClickListener(onClickListener: (position: Int) -> Unit){
-    this.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
-      override fun onChildViewAttachedToWindow(view: View) {
-        view.setOnClickListener(null)
-      }
-
-      override fun onChildViewDetachedFromWindow(view: View) {
-        view.setOnClickListener {
-          val holder = getChildViewHolder(view)
-          onClickListener.invoke(holder.adapterPosition)
-        }
-      }
-
-    })
-  }*/
 }
 
 class GridSpanSizeLookup(private val adapter: RecyclerAdapter) : GridLayoutManager.SpanSizeLookup() {
-  override fun getSpanSize(position: Int): Int {
-    return adapter.spanSizeLookup(position)
-  }
+  override fun getSpanSize(position: Int) = adapter.spanSizeLookup(position)
 }

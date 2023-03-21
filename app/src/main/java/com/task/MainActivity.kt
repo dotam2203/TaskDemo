@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
           TYPE_LAYOUT_CARD -> {
             val data = item as ParentList.DescriptionItem
             dialogDataShow("${data.value}\n${data.name}")
-            //Toast.makeText(this@MainActivity, "onclick Card - position ${data.value}", Toast.LENGTH_SHORT).show()
           }
           TYPE_LAYOUT_NESTED -> {
             val listData = arrayListOf<String>()
@@ -44,9 +43,8 @@ class MainActivity : AppCompatActivity() {
                 listData.addAll(listOf(data.description))
               }
             }
-            //ngắt chuỗi
+            //ngắt chuỗi: joinToString
             dialogDataShow("$position\n${listData.joinToString("\n")}")
-            //Toast.makeText(this@MainActivity, "onclick Nested - position ${listData.size}", Toast.LENGTH_SHORT).show()
           }
         }
       }
@@ -79,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     return list
   }
 
-  fun dialogDataShow(msg: String) {
+  private fun dialogDataShow(msg: String) {
     val dialog = Dialog(this)
     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
     dialog.setContentView(R.layout.dialog_data)
@@ -88,9 +86,9 @@ class MainActivity : AppCompatActivity() {
     window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
     window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-    val windowAtrributes: WindowManager.LayoutParams = window!!.attributes
-    windowAtrributes.gravity = Gravity.CENTER
-    window.attributes = windowAtrributes
+    val windowAttributes: WindowManager.LayoutParams = window!!.attributes
+    windowAttributes.gravity = Gravity.CENTER
+    window.attributes = windowAttributes
     //click ra bên ngoài để tắt dialog
     //false = no; true = yes
     dialog.setCancelable(true)
