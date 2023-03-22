@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         when (layoutType) {
           TYPE_LAYOUT_CARD -> {
             val data = item as ParentList.DescriptionItem
-            dialogDataShow("${data.value}\n${data.name}")
+            dialogDataShow("${data.id}\n${data.name}")
           }
           TYPE_LAYOUT_NESTED -> {
             val listData = arrayListOf<String>()
@@ -62,10 +62,10 @@ class MainActivity : AppCompatActivity() {
     val data1 = ParentList.DescriptionItem(1, "Đỗ Tâm")
     val data2 = ParentList.DescriptionItem(2, "Lê Đỗ")
     //data DescriptionItemChild
-    val view1 = ParentList.DescriptionItemChild("Full HD video resolution")
-    val view2 = ParentList.DescriptionItemChild("3-day event-based cloud video storage")
-    val view3 = ParentList.DescriptionItemChild("Al feature (human detection)")
-    val view4 = ParentList.DescriptionItemChild("No-cost maintenance and 24/7 support services")
+    val view1 = ParentList.DescriptionItemChild(3,"Full HD video resolution")
+    val view2 = ParentList.DescriptionItemChild(4,"3-day event-based cloud video storage")
+    val view3 = ParentList.DescriptionItemChild(5,"Al feature (human detection)")
+    val view4 = ParentList.DescriptionItemChild(6,"No-cost maintenance and 24/7 support services")
     //add list
     list.add(title)
     list.add(data1)

@@ -1,6 +1,7 @@
 package com.task.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,7 @@ class RecyclerAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bin(position: Int) {
+    fun bin() {
       val title = ParentList.TitleChoose("What would you \nlike to choose?")
       binding.textChoose.text = title.title
     }
@@ -33,7 +34,9 @@ class RecyclerAdapter(
   inner class ViewHolderCard(val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int, layoutType: Int) {
-      binding.textTitleTop.text = "IQ$position"
+      binding.item = listItems[position] as ParentList.DescriptionItem
+      //val text = (binding.item as? ParentList.DescriptionItem)?.name?: ""
+      //Log.e("DATA", "DATA:${binding.item.name}")
       binding.cardParent.setOnClickListener {
         onItemClick.invoke(listItems[position], position, layoutType)
       }
@@ -43,7 +46,6 @@ class RecyclerAdapter(
   inner class ViewHolderNestedList(val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int, layoutType: Int) {
-      binding.textTitleTop.text = "IQ$position"
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
         for (i in listItems) {
@@ -80,12 +82,11 @@ class RecyclerAdapter(
   }
 
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-    val item = listItems[position]
     val layoutType = getItemViewType(position)
     when (holder) {
       is ViewHolderNestedList -> holder.bin(position, layoutType)
       is ViewHolderCard -> holder.bin(position, layoutType)
-      is ViewHolderChoose -> holder.bin(position)
+      is ViewHolderChoose -> holder.bin()
     }
   }
 
