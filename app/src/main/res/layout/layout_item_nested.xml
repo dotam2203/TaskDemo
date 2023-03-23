@@ -6,7 +6,7 @@
   <data>
     <variable
         name="item"
-        type="com.task.model.ParentList" />
+        type="com.task.model.ParentList.DescriptionItemChild" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/iq3"
+        android:text="@{`IQ`+ item.id}"
         android:textColor="@color/orange"
         android:textSize="56sp"
         android:textStyle="bold"

@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
+import com.task.databinding.DescriptionLayoutBinding
 import com.task.databinding.LayoutItemCardBinding
 import com.task.databinding.LayoutItemNestedBinding
 import com.task.databinding.LayoutItemChooseBinding
@@ -24,36 +25,34 @@ class RecyclerAdapter(
   private val onItemClick: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  inner class ViewHolderChoose(val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderChoose(private val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin() {
-      val title = ParentList.TitleChoose("What would you \nlike to choose?")
-      binding.textChoose.text = title.title
+      binding.item = listItems[0] as ParentList.TitleChoose
     }
   }
 
-  inner class ViewHolderCard(val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderCard(private val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int, layoutType: Int) {
       binding.item = listItems[position] as ParentList.DescriptionItem
-      //val text = (binding.item as? ParentList.DescriptionItem)?.name?: ""
-      //Log.e("DATA", "DATA:${binding.item.name}")
+      Log.e("DATA", "DATA:${binding.item?.id.toString()}")
       binding.cardParent.setOnClickListener {
         onItemClick.invoke(listItems[position], position, layoutType)
       }
     }
   }
 
-  inner class ViewHolderNestedList(val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
+  inner class ViewHolderNestedList(private val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int, layoutType: Int) {
+      binding.item = listItems[position] as ParentList.DescriptionItemChild
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
         for (i in listItems) {
           if (i is ParentList.DescriptionItemChild) {
-            val view: View = LayoutInflater.from(itemView.context).inflate(R.layout.description_layout, null)
-            val title = view.findViewById<TextView>(R.id.text_title)
-            title.text = i.description
-            parentLayout.addView(view)
+            val view = DescriptionLayoutBinding.inflate(LayoutInflater.from(itemView.context),null, false)
+            view.item = i
+            parentLayout.addView(view.root)
           }
         }
       }
