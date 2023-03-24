@@ -23,19 +23,20 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private var items = ArrayList<ParentList>()
   private val recyclerAdapter by lazy {
-    RecyclerAdapter() { item, position, layoutType ->
-      when (layoutType) {
-        TYPE_LAYOUT_CARD -> {
+    RecyclerAdapter() { item, position ->
+      when (item) {
+        is ParentList.DescriptionItem -> {
           val data = item as ParentList.DescriptionItem
           dialogDataShow("${data.id}\n${data.name}")
         }
-        TYPE_LAYOUT_NESTED -> {
+        is ParentList.DescriptionItemChild -> {
           val listData = items.filterIsInstance<ParentList.DescriptionItemChild>().map {
             it.description
           }
           //ngắt chuỗi: joinToString
           dialogDataShow("$position\n${listData.joinToString("\n")}")
         }
+        else -> throw ExceptionInInitializerError("onclick fail!")
       }
     }
   }

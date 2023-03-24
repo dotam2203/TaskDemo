@@ -23,7 +23,7 @@ import com.task.model.ParentList
  * Date: 03/03/2023
  */
 class RecyclerAdapter(
-  private val onClickItem: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
+  private val onClickItem: ((item: ParentList, position: Int) -> Unit),
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   val diffCallback = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ParentList>() {
     override fun areItemsTheSame(oldItem: ParentList, newItem: ParentList) = oldItem.id == newItem.id
@@ -42,8 +42,8 @@ class RecyclerAdapter(
     fun bin(position: Int) {
       binding.item = diffCallback.currentList[position] as ParentList.DescriptionItem
       Log.e("DATA", "DATA:${binding.item?.id.toString()}")
-      binding.onClickItemCard = {layoutType ->
-        onClickItem(diffCallback.currentList[position],position,layoutType)
+      binding.onClickItemCard = {item ->
+        onClickItem(item,position)
       }
     }
   }
@@ -62,8 +62,8 @@ class RecyclerAdapter(
           }
         }
       }
-      binding.onClickItemNested = {layoutType ->
-        onClickItem.invoke(diffCallback.currentList[position], position, layoutType)
+      binding.onClickItemNested = {item ->
+        onClickItem.invoke(item, position)
       }
     }
   }

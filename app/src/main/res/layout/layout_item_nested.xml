@@ -11,7 +11,7 @@
         type="com.task.model.ParentList.DescriptionItemChild" />
     <variable
         name="onClickItemNested"
-        type="Function1&lt;Integer,Unit>" />
+        type="Function1&lt;com.task.model.ParentList.DescriptionItemChild,Unit>" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +19,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_margin="20dp"
-      android:onClick="@{() -> onClickItemNested.invoke(3)}"
+      android:onClick="@{() -> onClickItemNested.invoke(item)}"
       android:background="@drawable/custom_border"
       tools:context=".CustomLayout">
 
