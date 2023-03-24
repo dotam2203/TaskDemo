@@ -2,11 +2,15 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
   <data>
+    <import type="kotlin.Unit"/>
+    <import type="kotlin.jvm.functions.Function1"/>
     <variable
         name="item"
         type="com.task.model.ParentList.DescriptionItem" />
+    <variable
+        name="onClickItemCard"
+        type="Function1&lt;Integer,Unit>" />
   </data>
 
   <androidx.cardview.widget.CardView
@@ -15,6 +19,7 @@
       android:layout_height="250dp"
       android:layout_margin="20dp"
       app:cardElevation="4dp"
+      android:onClick="@{() -> onClickItemCard.invoke(2)}"
       app:cardCornerRadius="25dp">
 
     <LinearLayout

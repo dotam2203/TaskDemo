@@ -22,7 +22,7 @@ import com.task.model.ParentList
  */
 class RecyclerAdapter(
   private val listItems: ArrayList<ParentList>,
-  private val onItemClick: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
+  private val onClickItem: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   inner class ViewHolderChoose(private val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -33,18 +33,18 @@ class RecyclerAdapter(
 
   inner class ViewHolderCard(private val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int, layoutType: Int) {
+    fun bin(position: Int) {
       binding.item = listItems[position] as ParentList.DescriptionItem
       Log.e("DATA", "DATA:${binding.item?.id.toString()}")
-      binding.cardParent.setOnClickListener {
-        onItemClick.invoke(listItems[position], position, layoutType)
+      binding.onClickItemCard = {layoutType ->
+        onClickItem(listItems[position],position,layoutType)
       }
     }
   }
 
   inner class ViewHolderNestedList(private val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bin(position: Int, layoutType: Int) {
+    fun bin(position: Int) {
       binding.item = listItems[position] as ParentList.DescriptionItemChild
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
@@ -56,8 +56,8 @@ class RecyclerAdapter(
           }
         }
       }
-      binding.constraintParent.setOnClickListener {
-        onItemClick.invoke(listItems[position], position, layoutType)
+      binding.onClickItemNested = {layoutType ->
+        onClickItem.invoke(listItems[position], position, layoutType)
       }
     }
   }
@@ -83,8 +83,8 @@ class RecyclerAdapter(
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     val layoutType = getItemViewType(position)
     when (holder) {
-      is ViewHolderNestedList -> holder.bin(position, layoutType)
-      is ViewHolderCard -> holder.bin(position, layoutType)
+      is ViewHolderNestedList -> holder.bin(position)
+      is ViewHolderCard -> holder.bin(position)
       is ViewHolderChoose -> holder.bin()
     }
   }

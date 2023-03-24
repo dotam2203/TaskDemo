@@ -4,9 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
   <data>
+    <import type="kotlin.Unit"/>
+    <import type="kotlin.jvm.functions.Function1"/>
     <variable
         name="item"
         type="com.task.model.ParentList.DescriptionItemChild" />
+    <variable
+        name="onClickItemNested"
+        type="Function1&lt;Integer,Unit>" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +19,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_margin="20dp"
+      android:onClick="@{() -> onClickItemNested.invoke(3)}"
       android:background="@drawable/custom_border"
       tools:context=".CustomLayout">
 
