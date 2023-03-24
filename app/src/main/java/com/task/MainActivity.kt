@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun generateData() = arrayListOf(
-    ParentList.TitleChoose(0,"What would you \nlike to choose?"),
+    ParentList.TitleChoose(0, "What would you \nlike to choose?"),
     ParentList.DescriptionItem(1, "Đỗ Tâm"),
     ParentList.DescriptionItem(2, "Lê Đỗ"),
     ParentList.DescriptionItemChild(3, "Full HD video resolution"),

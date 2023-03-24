@@ -31,6 +31,7 @@ class RecyclerAdapter(
     override fun areContentsTheSame(oldItem: ParentList, newItem: ParentList) = oldItem == newItem
 
   })
+
   inner class ViewHolderChoose(private val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin() {
       binding.item = diffCallback.currentList[0] as ParentList.TitleChoose
@@ -42,8 +43,8 @@ class RecyclerAdapter(
     fun bin(position: Int) {
       binding.item = diffCallback.currentList[position] as ParentList.DescriptionItem
       Log.e("DATA", "DATA:${binding.item?.id.toString()}")
-      binding.onClickItemCard = {item ->
-        onClickItem(item,position)
+      binding.onClickItemCard = { item ->
+        onClickItem(item, position)
       }
     }
   }
@@ -56,13 +57,13 @@ class RecyclerAdapter(
       if (parentLayout.childCount == 0) {
         for (i in diffCallback.currentList) {
           if (i is ParentList.DescriptionItemChild) {
-            val view = DescriptionLayoutBinding.inflate(LayoutInflater.from(itemView.context),null, false)
+            val view = DescriptionLayoutBinding.inflate(LayoutInflater.from(itemView.context), null, false)
             view.item = i
             parentLayout.addView(view.root)
           }
         }
       }
-      binding.onClickItemNested = {item ->
+      binding.onClickItemNested = { item ->
         onClickItem.invoke(item, position)
       }
     }
