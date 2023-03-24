@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.task.R
@@ -21,23 +23,27 @@ import com.task.model.ParentList
  * Date: 03/03/2023
  */
 class RecyclerAdapter(
-  private val listItems: ArrayList<ParentList>,
   private val onClickItem: ((item: ParentList, position: Int, layoutType: Int) -> Unit),
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  val diffCallback = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ParentList>() {
+    override fun areItemsTheSame(oldItem: ParentList, newItem: ParentList) = oldItem.id == newItem.id
 
+    override fun areContentsTheSame(oldItem: ParentList, newItem: ParentList) = oldItem == newItem
+
+  })
   inner class ViewHolderChoose(private val binding: LayoutItemChooseBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin() {
-      binding.item = listItems[0] as ParentList.TitleChoose
+      binding.item = diffCallback.currentList[0] as ParentList.TitleChoose
     }
   }
 
   inner class ViewHolderCard(private val binding: LayoutItemCardBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int) {
-      binding.item = listItems[position] as ParentList.DescriptionItem
+      binding.item = diffCallback.currentList[position] as ParentList.DescriptionItem
       Log.e("DATA", "DATA:${binding.item?.id.toString()}")
       binding.onClickItemCard = {layoutType ->
-        onClickItem(listItems[position],position,layoutType)
+        onClickItem(diffCallback.currentList[position],position,layoutType)
       }
     }
   }
@@ -45,10 +51,10 @@ class RecyclerAdapter(
   inner class ViewHolderNestedList(private val binding: LayoutItemNestedBinding) : RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
     fun bin(position: Int) {
-      binding.item = listItems[position] as ParentList.DescriptionItemChild
+      binding.item = diffCallback.currentList[position] as ParentList.DescriptionItemChild
       val parentLayout = binding.linearParentItem
       if (parentLayout.childCount == 0) {
-        for (i in listItems) {
+        for (i in diffCallback.currentList) {
           if (i is ParentList.DescriptionItemChild) {
             val view = DescriptionLayoutBinding.inflate(LayoutInflater.from(itemView.context),null, false)
             view.item = i
@@ -57,7 +63,7 @@ class RecyclerAdapter(
         }
       }
       binding.onClickItemNested = {layoutType ->
-        onClickItem.invoke(listItems[position], position, layoutType)
+        onClickItem.invoke(diffCallback.currentList[position], position, layoutType)
       }
     }
   }
@@ -89,7 +95,7 @@ class RecyclerAdapter(
     }
   }
 
-  override fun getItemCount(): Int = listItems.size
+  override fun getItemCount(): Int = diffCallback.currentList.size
   override fun getItemViewType(position: Int) = when (position) {
     0 -> TYPE_LAYOUT_CHOOSE
     1, 2 -> TYPE_LAYOUT_CARD

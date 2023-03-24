@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private var items = ArrayList<ParentList>()
   private val recyclerAdapter by lazy {
-    RecyclerAdapter(items) { item, position, layoutType ->
+    RecyclerAdapter() { item, position, layoutType ->
       when (layoutType) {
         TYPE_LAYOUT_CARD -> {
           val data = item as ParentList.DescriptionItem
@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
   private fun initAdapter() {
     val layoutManagerGrid = GridLayoutManager(this@MainActivity, 2)
     items = generateData()
+    recyclerAdapter.diffCallback.submitList(items)
     binding.recycleList.apply {
       adapter = recyclerAdapter
       layoutManagerGrid.spanSizeLookup = GridSpanSizeLookup(adapter = recyclerAdapter)
