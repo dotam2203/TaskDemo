@@ -15,7 +15,11 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     override fun areContentsTheSame(oldItem: Genres, newItem: Genres) = oldItem == newItem
   })
 
-  inner class ViewHolder(val binding: ItemBinding) : RecyclerView.ViewHolder(binding.root) {}
+  inner class ViewHolder(val binding: ItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun bin(genres: Genres){
+      binding.item = genres
+    }
+  }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     //xác định giao diện  người dùng
@@ -24,12 +28,7 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    with(holder) {
-      //nhận dữ liệu để hiển thị lên UI
-      binding.item = diffGenres.currentList[position]
-      //tránh sử dụng lại các viewItem cũ/bị ẩn
-      setIsRecyclable(false)
-    }
+    holder.bin(diffGenres.currentList[position])
   }
 
   //kích thước của model
