@@ -1,4 +1,4 @@
-package com.task
+package com.entities
 
 data class DataModel(
   var genres: ArrayList<Genres>? = null,

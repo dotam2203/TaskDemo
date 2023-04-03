@@ -1,7 +1,6 @@
-package com.task
+package com.base
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 abstract class InitViewModel : Fragment() {
