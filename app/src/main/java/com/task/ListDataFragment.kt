@@ -4,15 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.adapters.RecyclerAdapter
-import com.base.InitViewModel
-import com.task.databinding.ListItemFragmentBinding
+import com.base.DataViewModel
 import com.entities.Genres
+import com.task.databinding.ListItemFragmentBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-class ListDataFragment : InitViewModel() {
+@AndroidEntryPoint
+class ListDataFragment : Fragment() {
   private lateinit var binding: ListItemFragmentBinding
+  val viewModel: DataViewModel by viewModels()
 
   //khởi tạo adapter
   private val recyclerAdapter by lazy {

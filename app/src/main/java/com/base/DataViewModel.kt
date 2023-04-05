@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.entities.Genres
 import com.repositories.ListDataRepository
+import com.services.ListDataService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DataViewModel : ViewModel() {
-  //khởi tạo
-  private val listRepository = ListDataRepository()
-
+@HiltViewModel
+class DataViewModel @Inject constructor(
+  private val listRepository: ListDataRepository
+): ViewModel() {
   //khởi tạo danh sách rỗng với MutableStateFlow
   private val _list = MutableStateFlow(emptyList<Genres>())
 
