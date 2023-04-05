@@ -7,10 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.task.databinding.ItemBinding
 import com.entities.Genres
+import javax.inject.Inject
 
-class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
-  //khởi tạo GenresModel
-  var genres = mutableListOf<Genres>()
+class RecyclerAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
   val diffGenres = AsyncListDiffer(this, object : DiffUtil.ItemCallback<Genres>() {
     override fun areItemsTheSame(oldItem: Genres, newItem: Genres) = oldItem.id == newItem.id
     override fun areContentsTheSame(oldItem: Genres, newItem: Genres) = oldItem == newItem

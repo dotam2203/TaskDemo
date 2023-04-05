@@ -5,6 +5,7 @@ import com.services.ListDataService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
@@ -14,13 +15,9 @@ import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
 class ListDataRepository @Inject constructor(
   private var listDataService: ListDataService,
 ) {
-  @Provides
-  @Singleton
   fun getShowItem(api_key: String): Flow<Response<DataModel>> = flow {
     //thực hiện gọi API bằng retrofit
     val request = listDataService.getItem(api_key)

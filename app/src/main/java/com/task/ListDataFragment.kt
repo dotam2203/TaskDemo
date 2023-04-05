@@ -13,16 +13,18 @@ import com.base.DataViewModel
 import com.entities.Genres
 import com.task.databinding.ListItemFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ListDataFragment : Fragment() {
   private lateinit var binding: ListItemFragmentBinding
   val viewModel: DataViewModel by viewModels()
-
-  //khởi tạo adapter
+  @Inject
+  lateinit var recyclerAdapter: RecyclerAdapter
+  /*//khởi tạo adapter
   private val recyclerAdapter by lazy {
     RecyclerAdapter()
-  }
+  }*/
 
   //khởi tạo GenresModel
   private val genres = ArrayList<Genres>()

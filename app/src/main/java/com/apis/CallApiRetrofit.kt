@@ -33,11 +33,6 @@ object CallApiRetrofit {
     }.build())
     .addConverterFactory(GsonConverterFactory.create())
     .build()
-
-  //khi nào được gọi thì Service mới được khởi tạo
-  /*val loadApi: ListDataService by lazy {
-    getApiUrl().create(ListDataService::class.java)
-  }*/
   @Provides
   @Singleton
   fun loadApi(): ListDataService = getApiUrl().create(ListDataService::class.java)
