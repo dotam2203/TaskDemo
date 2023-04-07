@@ -5,7 +5,7 @@
     <data>
         <variable
             name="item"
-            type="com.entities.Genres" />
+            type="com.dto.Genres" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

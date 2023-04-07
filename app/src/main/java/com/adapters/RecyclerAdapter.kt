@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.task.databinding.ItemBinding
-import com.entities.Genres
+import com.dto.Genres
 import javax.inject.Inject
 
 class RecyclerAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
@@ -28,7 +28,10 @@ class RecyclerAdapter @Inject constructor() : RecyclerView.Adapter<RecyclerAdapt
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    holder.bin(diffGenres.currentList[position])
+    val item = diffGenres.currentList
+    if(position < item.size){
+      holder.bin(item[position])
+    }
   }
 
   //kích thước của model

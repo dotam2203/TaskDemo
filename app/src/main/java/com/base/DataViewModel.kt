@@ -2,9 +2,8 @@ package com.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.entities.Genres
+import com.dto.Genres
 import com.repositories.ListDataRepository
-import com.services.ListDataService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
