@@ -8,4 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="trans">#00000000 </color>
+    <color name="blue">#7895B2 </color>
+    <color name="blue_100">#2596BE </color>
+    <color name="blue_200">#2B4865 </color>
+    <color name="pink_100">#E8DFCA </color>
+    <color name="pink_200">#AEBDCA </color>
+    <color name="pink_300">#F5EFE6 </color>
+
 </resources>

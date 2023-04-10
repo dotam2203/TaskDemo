@@ -1,10 +1,13 @@
 package com.apis
 
-import com.services.ListDataService
+import com.apis.Constants.API_KEY
+import com.apis.Constants.BASE_URL
+import com.services.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,7 +20,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object CallApiRetrofit {
-  val BASE_URL = "https://api.themoviedb.org/3/movie/" //const
   @Provides
   @Singleton
   fun getApiUrl(): Retrofit = Retrofit.Builder()
@@ -35,5 +37,5 @@ object CallApiRetrofit {
     .build()
   @Provides
   @Singleton
-  fun loadApi(): ListDataService = getApiUrl().create(ListDataService::class.java)
+  fun loadApi(): ApiService = getApiUrl().create(ApiService::class.java)
 }

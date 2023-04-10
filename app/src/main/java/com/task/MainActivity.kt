@@ -1,6 +1,7 @@
 package com.task
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.task.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +16,8 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun getFragment() {
-    val fragment = ListDataFragment()
+    binding.tbTop.visibility = View.GONE
+    val fragment = MoviesFragment()
     supportFragmentManager.beginTransaction().replace(R.id.fragment, fragment).commit()
   }
 

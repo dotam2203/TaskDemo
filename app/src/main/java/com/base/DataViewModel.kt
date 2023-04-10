@@ -2,31 +2,42 @@ package com.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dto.Genres
-import com.repositories.ListDataRepository
+import com.dto.MovieDetailsDTO
+import com.dto.MovieListDTO
+import com.repositories.MovieDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DataViewModel @Inject constructor(
-  private val listRepository: ListDataRepository
+  private val dataRepository: MovieDataRepository
 ): ViewModel() {
-  //khởi tạo danh sách rỗng với MutableStateFlow
-  private val _list = MutableStateFlow(emptyList<Genres>())
+  //movie list
+  private val _movies: MutableStateFlow<MovieListDTO?>  = MutableStateFlow(null)
+  val movies: StateFlow<MovieListDTO?> = _movies
+  //movie detail
+  private val _movie: MutableStateFlow<MovieDetailsDTO?>  = MutableStateFlow(null)
+  val movie: StateFlow<MovieDetailsDTO?> = _movie
 
-  //khởi tạo gán giá trị cho _list khi list lấy được giá trị khi dùng coroutines ở MainActivity
-  val list: StateFlow<List<Genres>> = _list
-
-  fun getItemToApi() {
+  fun getMovieList(page: Int){
     viewModelScope.launch {
-      listRepository.getShowItem("e13cc716899ae5b7470d71870624e435").collect {
-        //check call api thành công
-        if (it.isSuccessful)
-        //lấy được danh sách Genres
-          _list.value = it.body()?.genres!!
+      dataRepository.getPopularList(page).collect{
+        if(it.isSuccessful){
+          _movies.value = it.body()
+        }
+      }
+    }
+  }
+  fun getMovieDetails(movie_id: Int){
+    viewModelScope.launch {
+      dataRepository.getMovieDetail(movie_id).collect{
+        if(it.isSuccessful){
+          _movie.value = it.body()
+        }
       }
     }
   }
