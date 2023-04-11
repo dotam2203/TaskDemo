@@ -5,4 +5,5 @@
   <string name="movie_name">movieName</string>
   <string name="textview">TextView</string>
   <string name="date_release">Date Release</string>
+  <string name="movie_info">Movie Info</string>
 </resources>

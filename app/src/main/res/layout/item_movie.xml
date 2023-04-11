@@ -3,11 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
-    <import type="com.apis.Constants"/>
+    <import type="kotlin.Unit"/>
+    <import type="kotlin.jvm.functions.Function1"/>
     <variable
         name="item"
         type="com.dto.MovieListDTO.Result" />
-
+    <variable
+        name="onItemClick"
+        type="Function1&lt;com.dto.MovieListDTO.Result,Unit>" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="130dp"
         android:background="@drawable/bg_main"
+        android:onClick="@{() -> onItemClick.invoke(item)}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

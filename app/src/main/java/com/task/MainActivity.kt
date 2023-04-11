@@ -12,13 +12,5 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    getFragment()
   }
-
-  private fun getFragment() {
-    binding.tbTop.visibility = View.GONE
-    val fragment = MoviesFragment()
-    supportFragmentManager.beginTransaction().replace(R.id.fragment, fragment).commit()
-  }
-
 }

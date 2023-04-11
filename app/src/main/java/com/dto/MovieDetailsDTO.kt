@@ -1,15 +1,18 @@
 package com.dto
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class MovieDetailsDTO(
   @SerializedName("adult")
   val adult: Boolean?, // false
   @SerializedName("backdrop_path")
   val backdropPath: String?, // /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
   @SerializedName("belongs_to_collection")
-  val belongsToCollection: Any?, // null
+  val belongsToCollection: String?, // null
   @SerializedName("budget")
   val budget: Int?, // 63000000
   @SerializedName("genres")
@@ -29,7 +32,7 @@ data class MovieDetailsDTO(
   @SerializedName("popularity")
   val popularity: Double?, // 0.5
   @SerializedName("poster_path")
-  val posterPath: Any?, // null
+  val posterPath: String?, // null
   @SerializedName("production_companies")
   val productionCompanies: List<ProductionCompany?>?,
   @SerializedName("production_countries")
@@ -54,14 +57,16 @@ data class MovieDetailsDTO(
   val voteAverage: Double?, // 7.8
   @SerializedName("vote_count")
   val voteCount: Int?, // 3439
-){
+) : Parcelable {
+  @Parcelize
   data class Genre(
     @SerializedName("id")
     val id: Int?, // 18
     @SerializedName("name")
     val name: String?, // Drama
-  )
+  ) : Parcelable
 
+  @Parcelize
   data class ProductionCompany(
     @SerializedName("id")
     val id: Int?, // 508
@@ -71,20 +76,22 @@ data class MovieDetailsDTO(
     val name: String?, // Regency Enterprises
     @SerializedName("origin_country")
     val originCountry: String?, // US
-  )
+  ) : Parcelable
 
+  @Parcelize
   data class ProductionCountry(
     @SerializedName("iso_3166_1")
     val iso31661: String?, // US
     @SerializedName("name")
     val name: String?, // United States of America
-  )
+  ) : Parcelable
 
+  @Parcelize
   data class SpokenLanguage(
     @SerializedName("iso_639_1")
     val iso6391: String?, // en
     @SerializedName("name")
     val name: String?, // English
-  )
+  ) : Parcelable
 }
 
