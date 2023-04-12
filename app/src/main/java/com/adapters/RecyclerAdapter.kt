@@ -13,8 +13,8 @@ import com.task.R
 import com.task.databinding.ItemMovieBinding
 import javax.inject.Inject
 
-class RecyclerAdapter (
-  private val onItemClickListener: ((item: MovieListDTO.Result) -> Unit)
+class RecyclerAdapter(
+  private val onItemClickListener: ((item: MovieListDTO.Result) -> Unit),
 ) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
   val diffUtilMovies = AsyncListDiffer(this, object : DiffUtil.ItemCallback<MovieListDTO.Result>() {
     override fun areItemsTheSame(oldItem: MovieListDTO.Result, newItem: MovieListDTO.Result): Boolean {
@@ -24,18 +24,17 @@ class RecyclerAdapter (
     override fun areContentsTheSame(oldItem: MovieListDTO.Result, newItem: MovieListDTO.Result): Boolean {
       return oldItem == newItem
     }
-
   })
 
   inner class ViewHolder(private val binding: ItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bin(movies: MovieListDTO.Result) {
       binding.item = movies
-      binding.imageMovie.load(POSTER_BASE_URL + movies.posterPath){
+      binding.imageMovie.load(POSTER_BASE_URL + movies.posterPath) {
         crossfade(true)
         placeholder(R.drawable.poster_placeholder)
         scale(Scale.FILL)
       }
-      binding.onItemClick = {itemMovie ->
+      binding.onItemClick = { itemMovie ->
         onItemClickListener.invoke(itemMovie)
       }
     }

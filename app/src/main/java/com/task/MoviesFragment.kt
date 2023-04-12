@@ -15,17 +15,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.adapters.RecyclerAdapter
 import com.base.DataViewModel
+import com.base.InjectViewModel
+import com.dto.ConvertData.toMovieDetails
+import com.dto.MovieDetails
 import com.dto.MovieListDTO
 import com.task.databinding.FragmentMoviesBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
-class MoviesFragment : Fragment() {
+class MoviesFragment : InjectViewModel() {
   private lateinit var binding: FragmentMoviesBinding
   private var movieList = mutableListOf<MovieListDTO.Result?>()
   private var currentPage = 1
-  val viewModel: DataViewModel by viewModels()
   private val recyclerAdapter by lazy {
     RecyclerAdapter() { itemMovie ->
       if (itemMovie.voteAverage!! >= 7.0)
@@ -50,7 +52,8 @@ class MoviesFragment : Fragment() {
     lifecycleScope.launchWhenStarted {
       viewModel.movie.collect {
         if (it != null) {
-          val direction = MoviesFragmentDirections.moviesFragmentToMovieDetailFragment(it)
+          val movieDetails = it.toMovieDetails()
+          val direction = MoviesFragmentDirections.moviesFragmentToMovieDetailFragment(movieDetails)
           findNavController().navigate(direction)
         }
       }

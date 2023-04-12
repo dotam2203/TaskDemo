@@ -24,6 +24,6 @@
         app:destination="@id/moviesFragment" />
     <argument
         android:name="movie_detail"
-        app:argType="com.dto.MovieDetailsDTO" />
+        app:argType="com.dto.MovieDetails" />
   </fragment>
 </navigation>

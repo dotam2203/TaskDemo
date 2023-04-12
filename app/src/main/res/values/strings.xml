@@ -2,8 +2,12 @@
   <string name="app_name">Call Api</string>
   <!-- TODO: Remove or change this placeholder text -->
   <string name="hello_blank_fragment">Hello blank fragment</string>
-  <string name="movie_name">movieName</string>
-  <string name="textview">TextView</string>
-  <string name="date_release">Date Release</string>
-  <string name="movie_info">Movie Info</string>
+  <string name="movie_info">Thông tin phim</string>
+  <string name="revenue">Doanh thu: </string>
+  <string name="genres">Thể loại: </string>
+  <string name="overview">Nội dung: </string>
+  <string name="budget">Chi phí: </string>
+  <string name="runtime">Thời gian chiếu: </string>
+  <string name="rating">Đánh giá: </string>
+  <string name="release_date">Ngày khởi chiếu: </string>
 </resources>

@@ -3,11 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
-    <import type="kotlin.Unit"/>
-    <import type="kotlin.jvm.functions.Function1"/>
+
+    <import type="kotlin.Unit" />
+
+    <import type="kotlin.jvm.functions.Function1" />
+
     <variable
         name="item"
         type="com.dto.MovieListDTO.Result" />
+
     <variable
         name="onItemClick"
         type="Function1&lt;com.dto.MovieListDTO.Result,Unit>" />
@@ -89,13 +93,14 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="4dp"
           android:text="@{item.originalLanguage}"
+          android:textAllCaps="true"
           android:textColor="@color/pink_100"
           android:textSize="10sp"
           android:textStyle="bold"
-          android:textAllCaps="true"
           app:layout_constraintBottom_toBottomOf="@+id/image_lang"
           app:layout_constraintStart_toEndOf="@+id/image_lang"
           app:layout_constraintTop_toTopOf="@+id/image_lang" />
+
       <ImageView
           android:id="@+id/image_date"
           android:layout_width="15dp"
@@ -119,6 +124,7 @@
           app:layout_constraintStart_toEndOf="@+id/image_date"
           app:layout_constraintTop_toTopOf="@+id/image_date" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/image_root"
         android:layout_width="wrap_content"
@@ -127,6 +133,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/data_root"
         app:layout_constraintTop_toTopOf="parent">
+
       <com.google.android.material.imageview.ShapeableImageView
           android:id="@+id/image_movie"
           android:layout_width="115dp"
@@ -135,12 +142,12 @@
           android:layout_marginBottom="2dp"
           android:background="@color/white"
           android:scaleType="fitXY"
+          android:src="@drawable/poster_placeholder"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          app:shapeAppearanceOverlay="@style/RoundedImageView"
-          android:src="@drawable/poster_placeholder"/>
+          app:shapeAppearanceOverlay="@style/RoundedImageView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

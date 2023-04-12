@@ -8,5 +8,5 @@ import dagger.hilt.android.HiltAndroidApp
  * Date: 05/04/2023
  */
 @HiltAndroidApp
-class HiltApplication: Application() {
+class HiltApplication : Application() {
 }

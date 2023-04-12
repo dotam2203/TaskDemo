@@ -35,6 +35,7 @@ object CallApiRetrofit {
     }.build())
     .addConverterFactory(GsonConverterFactory.create())
     .build()
+
   @Provides
   @Singleton
   fun loadApi(): ApiService = getApiUrl().create(ApiService::class.java)
