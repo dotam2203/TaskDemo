@@ -1,13 +1,11 @@
 package com.apis
 
-import com.apis.Constants.API_KEY
-import com.apis.Constants.BASE_URL
+import com.constants.Constants.BASE_URL
 import com.services.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.logging.HttpLoggingInterceptor

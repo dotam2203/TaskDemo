@@ -7,14 +7,14 @@
 
     <variable
         name="movie"
-        type="com.dto.MovieDetails" />
+        type="com.model.MovieDetailModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:background="@color/pink_200"
-      tools:context=".MovieDetailFragment">
+      tools:context="com.fragments.MovieDetailFragment">
     <ImageButton
         android:id="@+id/image_back"
         android:layout_width="wrap_content"
@@ -96,7 +96,18 @@
               app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintTop_toTopOf="parent" />
-
+          <TextView
+              android:id="@+id/text_movie_tagline"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:text="@{movie.tagline}"
+              android:textAlignment="center"
+              android:textColor="@color/pink_300"
+              android:textSize="12sp"
+              android:textStyle="bold"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toBottomOf="@+id/text_movie_title" />
           <TextView
               android:id="@+id/text_movie_info"
               android:layout_width="wrap_content"
@@ -109,7 +120,7 @@
               android:textStyle="bold"
               app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintTop_toBottomOf="@+id/text_movie_title" />
+              app:layout_constraintTop_toBottomOf="@+id/text_movie_tagline" />
 
           <TextView
               android:id="@+id/text_date_release_title"

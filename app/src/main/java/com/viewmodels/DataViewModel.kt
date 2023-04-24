@@ -1,4 +1,4 @@
-package com.base
+package com.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,6 @@ import com.repositories.MovieDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,20 +25,30 @@ class DataViewModel @Inject constructor(
 
   fun getMovieList(page: Int) {
     viewModelScope.launch {
-      dataRepository.getPopularList(page).collect {
-        if (it.isSuccessful) {
-          _movies.value = it.body()
+      try {
+        dataRepository.getPopularList(page).collect {
+          if (it.isSuccessful) {
+            _movies.value = it.body()
+          } else {
+            _movies.value = null
+          }
         }
+      } catch (e: Exception) {
+        _movies.value = null
       }
     }
   }
 
   fun getMovieDetails(movie_id: Int) {
     viewModelScope.launch {
-      dataRepository.getMovieDetail(movie_id).collect {
-        if (it.isSuccessful) {
-          _movie.value = it.body()
+      try {
+        dataRepository.getMovieDetail(movie_id).collect {
+          if (it.isSuccessful) {
+            _movie.value = it.body()
+          }
         }
+      } catch (e: Exception) {
+        _movie.value = null
       }
     }
   }

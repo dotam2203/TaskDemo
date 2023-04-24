@@ -1,4 +1,4 @@
-package com.apis
+package com.constants
 
 /**
  * Author: tamdt35@fpt.com.vn

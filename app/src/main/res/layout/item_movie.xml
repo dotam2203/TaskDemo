@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
-
+    <import type="com.constants.Constants"/>
     <import type="kotlin.Unit" />
 
     <import type="kotlin.jvm.functions.Function1" />
@@ -141,8 +141,8 @@
           android:layout_marginTop="2dp"
           android:layout_marginBottom="2dp"
           android:background="@color/white"
-          android:scaleType="fitXY"
           android:src="@drawable/poster_placeholder"
+          android:scaleType="fitXY"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
