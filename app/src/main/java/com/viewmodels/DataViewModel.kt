@@ -8,6 +8,7 @@ import com.repositories.MovieDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +18,11 @@ class DataViewModel @Inject constructor(
 ) : ViewModel() {
   //movie list
   private val _movies: MutableStateFlow<MovieListDTO?> = MutableStateFlow(null)
-  val movies: StateFlow<MovieListDTO?> = _movies
+  val movies = _movies.asStateFlow()
 
   //movie detail
   private val _movie: MutableStateFlow<MovieDetailsDTO?> = MutableStateFlow(null)
-  var movie: StateFlow<MovieDetailsDTO?> = _movie
+  var movie = _movie.asStateFlow()
 
   fun getMovieList(page: Int) {
     viewModelScope.launch {
