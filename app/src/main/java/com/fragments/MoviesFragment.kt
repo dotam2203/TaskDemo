@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import android.widget.Toast.makeText
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,9 @@ import com.task.databinding.FragmentMoviesBinding
 import com.viewmodels.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class MoviesFragment : Fragment() {
@@ -29,9 +33,7 @@ class MoviesFragment : Fragment() {
   private var currentPage = 1
   private val recyclerAdapter by lazy {
     RecyclerAdapter() { itemMovie ->
-      itemMovie.id?.let {
-        getDataMovieSend(itemMovie.id)
-      }?: makeText(requireContext(), "Movie Detail Empty!", Toast.LENGTH_LONG).show()
+      getDataMovieSend(itemMovie.id!!)
       /*if (itemMovie.voteAverage!! >= 7.0)
         getDataMovieSend(itemMovie.id!!)
       else
@@ -44,7 +46,6 @@ class MoviesFragment : Fragment() {
     savedInstanceState: Bundle?,
   ): View? {
     binding = FragmentMoviesBinding.inflate(layoutInflater)
-    binding.progressBarMovies.visibility = View.VISIBLE
     initAdapter()
     return binding.root
   }
@@ -65,16 +66,20 @@ class MoviesFragment : Fragment() {
   private fun initViewModel(page: Int) {
     viewModel.getMovieList(page)
     lifecycleScope.launchWhenStarted {
-      viewModel.movies.collect {
-        it?.results?.let { results ->
+      viewModel.movies.collect { movieResponse ->
+        movieResponse?.results?.let { results ->
           if (results.isNotEmpty()) {
-            movieList.addAll(it.results)
+            movieList.addAll(results)
+            binding.textEmpty.isVisible = false
             delay(1000L)
-            binding.progressBarMovies.visibility = View.GONE
+            binding.progressBarMovies.isVisible = false
             recyclerAdapter.diffUtilMovies.submitList(movieList.toList())
           } else {
-            makeText(requireContext(), "Movie List Empty!", Toast.LENGTH_LONG).show()
-            binding.progressBarMovies.visibility = View.GONE
+            delay(1000L)
+            binding.apply {
+              progressBarMovies.isVisible = false
+              textEmpty.isVisible = true
+            }
           }
         }
       }
