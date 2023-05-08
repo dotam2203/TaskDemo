@@ -1,4 +1,4 @@
-package com.fragments
+package com.task.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +9,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import coil.size.Scale
-import com.constants.Constants.POSTER_BASE_URL
-import com.model.MovieDetailModel
 import com.task.R
+import com.task.constants.Constants.POSTER_BASE_URL
 import com.task.databinding.FragmentMovieDetailBinding
+import com.task.model.MovieDetailModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,7 +35,7 @@ class MovieDetailFragment : Fragment() {
   private fun getIdMovieDetail(movieDetails: MovieDetailModel) {
     binding.progressBarMovies.visibility = View.GONE
     val genreNames = movieDetails.genres?.joinToString(" | ")
-    val formatRating = String.format("%.1f",movieDetails.voteAverage)
+    val formatRating = String.format("%.1f", movieDetails.voteAverage)
     val moviePoster = POSTER_BASE_URL + movieDetails.posterPath
     binding.apply {
       movie = movieDetails

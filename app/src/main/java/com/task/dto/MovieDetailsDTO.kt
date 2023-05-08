@@ -1,4 +1,4 @@
-package com.dto
+package com.task.dto
 
 
 import com.google.gson.annotations.SerializedName

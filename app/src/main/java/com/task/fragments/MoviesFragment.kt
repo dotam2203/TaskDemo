@@ -1,5 +1,6 @@
-package com.fragments
+package com.task.fragments
 
+import NotificationHelper
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,16 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.adapters.RecyclerAdapter
-import com.dto.MovieListDTO
-import com.model.toMovieDetailModel
+import com.task.adapters.RecyclerAdapter
 import com.task.databinding.FragmentMoviesBinding
-import com.viewmodels.DataViewModel
+import com.task.dto.MovieListDTO
+import com.task.firebase.MyFirebaseMessagingService
+import com.task.model.toMovieDetailModel
+import com.task.viewmodels.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class MoviesFragment : Fragment() {
@@ -45,6 +44,8 @@ class MoviesFragment : Fragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View? {
+    //NotificationHelper(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").CustomNotification()
+    MyFirebaseMessagingService(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").Notification()
     binding = FragmentMoviesBinding.inflate(layoutInflater)
     initAdapter()
     return binding.root

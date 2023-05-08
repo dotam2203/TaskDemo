@@ -1,8 +1,8 @@
-package com.services
+package com.task.services
 
-import com.constants.Constants.API_KEY
-import com.dto.MovieDetailsDTO
-import com.dto.MovieListDTO
+import com.task.constants.Constants.API_KEY
+import com.task.dto.MovieDetailsDTO
+import com.task.dto.MovieListDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

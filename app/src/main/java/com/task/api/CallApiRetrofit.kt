@@ -1,15 +1,10 @@
-package com.apis
+package com.task.api
 
-import android.content.Context
-import com.apis.CallApiRetrofit_GetApiUrlFactory.getApiUrl
-import com.chuckerteam.chucker.api.ChuckerCollector
-import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.constants.Constants.BASE_URL
-import com.services.ApiService
+import com.task.constants.Constants.BASE_URL
+import com.task.services.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.Protocol

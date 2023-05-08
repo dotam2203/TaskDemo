@@ -1,8 +1,8 @@
-package com.repositories
+package com.task.repositories
 
-import com.dto.MovieDetailsDTO
-import com.dto.MovieListDTO
-import com.services.ApiService
+import com.task.dto.MovieDetailsDTO
+import com.task.dto.MovieListDTO
+import com.task.services.ApiService
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

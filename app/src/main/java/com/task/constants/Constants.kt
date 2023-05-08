@@ -1,4 +1,4 @@
-package com.constants
+package com.task.constants
 
 /**
  * Author: tamdt35@fpt.com.vn

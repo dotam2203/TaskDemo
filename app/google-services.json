@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "899982558599",
+    "project_id": "customizenotifications",
+    "storage_bucket": "customizenotifications.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899982558599:android:da3de09aa9698dac8eff22",
+        "android_client_info": {
+          "package_name": "com.task"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899982558599-kdg7kamhsuo2k0gprn6ip7moh56u8336.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2TGAK46SuNUWVcKNrZ1cP_gTKog6diKg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899982558599-kdg7kamhsuo2k0gprn6ip7moh56u8336.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

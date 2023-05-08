@@ -1,7 +1,7 @@
-package com.model
+package com.task.model
 
 import android.os.Parcelable
-import com.dto.MovieDetailsDTO
+import com.task.dto.MovieDetailsDTO
 import kotlinx.parcelize.Parcelize
 
 /**
