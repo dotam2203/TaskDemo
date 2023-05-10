@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.task.adapters.RecyclerAdapter
 import com.task.databinding.FragmentMoviesBinding
 import com.task.dto.MovieListDTO
-import com.task.firebase.MyFirebaseMessagingService
 import com.task.model.toMovieDetailModel
 import com.task.viewmodels.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,8 +43,8 @@ class MoviesFragment : Fragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View? {
-    //NotificationHelper(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").CustomNotification()
-    MyFirebaseMessagingService(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").Notification()
+    NotificationHelper(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").CustomNotification()
+    //MyFirebaseMessagingService(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").Notification()
     binding = FragmentMoviesBinding.inflate(layoutInflater)
     initAdapter()
     return binding.root

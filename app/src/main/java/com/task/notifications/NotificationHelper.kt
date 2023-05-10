@@ -3,6 +3,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.task.R
@@ -21,10 +22,11 @@ class NotificationHelper(val context: Context, val title: String, val message: S
     contentView.setTextViewText(R.id.text_title_noti,title)
     contentView.setTextViewText(R.id.text_message_noti,message)
     val builder = NotificationCompat.Builder(context,CHANNEL_ID)
-      .setSmallIcon(R.drawable.ic_star)
-      //.setContent(contentView)
+      .setSmallIcon(R.drawable.ic_notification)
+      .setStyle(NotificationCompat.DecoratedCustomViewStyle())
       .setCustomContentView(contentView)
-    builder.setContent(contentView)
+      //.setCustomBigContentView(contentView)
+      builder.setContent(contentView)
     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
       val channel = NotificationChannel(CHANNEL_ID,"Custom CustomNotification",NotificationManager.IMPORTANCE_DEFAULT)
       channel.enableVibration(true)
