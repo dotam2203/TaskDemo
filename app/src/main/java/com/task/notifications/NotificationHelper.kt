@@ -15,7 +15,7 @@ import com.task.R
 class NotificationHelper(val context: Context, val title: String, val message: String){
   private val CHANNEL_ID = "Message_test"
   private val NOTIFICATION_ID = 123
-  @SuppressLint("RemoteViewLayout")
+  @SuppressLint("RemoteViewLayout", "SuspiciousIndentation")
   fun CustomNotification(){
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val contentView = RemoteViews(context.packageName, R.layout.notification_message)
