@@ -32,6 +32,8 @@ class MoviesFragment : Fragment() {
   private val recyclerAdapter by lazy {
     RecyclerAdapter() { itemMovie ->
       getDataMovieSend(itemMovie.id!!)
+      //NotificationHelper(requireContext(), "Hành động mới", itemMovie.originalTitle.toString(),itemMovie.).CustomNotification()
+
       /*if (itemMovie.voteAverage!! >= 7.0)
         getDataMovieSend(itemMovie.id!!)
       else
@@ -44,7 +46,6 @@ class MoviesFragment : Fragment() {
     savedInstanceState: Bundle?,
   ): View? {
     NotificationHelper(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").CustomNotification()
-    //MyFirebaseMessagingService(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").Notification()
     binding = FragmentMoviesBinding.inflate(layoutInflater)
     initAdapter()
     return binding.root

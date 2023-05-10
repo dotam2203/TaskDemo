@@ -4,27 +4,26 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
   <TextView
-      android:id="@+id/text_title_noti"
+      android:id="@+id/text_title_expand_noti"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Notification"
-      android:layout_marginTop="10dp"
       android:textColor="@color/black"
       android:layout_alignParentTop="true"
       android:layout_alignParentLeft="true"
       style="@style/TextAppearance.Compat.Notification.Title"/>
   <TextView
-      android:id="@+id/text_message_noti"
+      android:id="@+id/text_expand_noti"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:text="The messaging"
-      android:layout_below="@id/text_title_noti"
-      style="@style/TextAppearance.Compat.Notification"/>
+      android:layout_below="@id/text_title_expand_noti"
+      style="@style/TextAppearance.Compat.Notification.Info"/>
   <ImageView
-      android:id="@+id/image_poster_noti"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:scaleType="fitXY"
-      android:src="@drawable/poster_placeholder"
-      android:layout_alignParentEnd="true" />
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/text_expand_noti"
+      android:scaleType="center"
+      android:layout_marginTop="10dp"
+      android:src="@drawable/poster_placeholder"/>
 </RelativeLayout>
