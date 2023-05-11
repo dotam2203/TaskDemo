@@ -20,6 +20,7 @@
       android:layout_below="@id/text_title_expand_noti"
       style="@style/TextAppearance.Compat.Notification.Info"/>
   <ImageView
+      android:id="@+id/image_expand_noti"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/text_expand_noti"

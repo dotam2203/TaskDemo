@@ -32,7 +32,10 @@ class MoviesFragment : Fragment() {
   private val recyclerAdapter by lazy {
     RecyclerAdapter() { itemMovie ->
       getDataMovieSend(itemMovie.id!!)
-      //NotificationHelper(requireContext(), "Hành động mới", itemMovie.originalTitle.toString(),itemMovie.).CustomNotification()
+      lifecycleScope.launchWhenStarted {
+        delay(1000L)
+        NotificationHelper(requireContext(), "Thông tin phim", itemMovie.originalTitle.toString(),itemMovie.posterPath.toString()).CustomNotification()
+      }
 
       /*if (itemMovie.voteAverage!! >= 7.0)
         getDataMovieSend(itemMovie.id!!)
