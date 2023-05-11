@@ -1,6 +1,6 @@
 package com.task.api
 
-import com.task.constants.Constants.BASE_URL
+import com.example.notification.Constants.BASE_URL
 import com.task.services.ApiService
 import dagger.Module
 import dagger.Provides

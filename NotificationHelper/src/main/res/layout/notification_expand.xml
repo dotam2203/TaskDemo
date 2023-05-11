@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
   <TextView
       android:id="@+id/text_title_expand_noti"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Notification"
+      android:text="@string/notification"
       android:textColor="@color/black"
       android:layout_alignParentTop="true"
       android:layout_alignParentLeft="true"
@@ -16,7 +15,7 @@
       android:id="@+id/text_expand_noti"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="The messaging"
+      android:text="@string/the_messaging"
       android:layout_below="@id/text_title_expand_noti"
       style="@style/TextAppearance.Compat.Notification.Info"/>
   <ImageView
@@ -24,7 +23,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/text_expand_noti"
-      android:scaleType="center"
+      android:scaleType="fitXY"
       android:layout_marginTop="10dp"
-      android:src="@drawable/poster_placeholder"/>
+      android:src="@drawable/poster_placeholder"
+      android:contentDescription="@null"/>
 </RelativeLayout>

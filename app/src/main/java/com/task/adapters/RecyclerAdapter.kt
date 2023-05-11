@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.size.Scale
-import com.task.constants.Constants.POSTER_BASE_URL
+import com.example.notification.Constants.POSTER_BASE_URL
 import com.task.dto.MovieListDTO
 import com.task.R
 import com.task.databinding.ItemMovieBinding

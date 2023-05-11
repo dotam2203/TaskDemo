@@ -1,4 +1,4 @@
-package com.task.constants
+package com.example.notification
 
 /**
  * Author: tamdt35@fpt.com.vn

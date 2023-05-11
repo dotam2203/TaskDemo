@@ -1,6 +1,6 @@
 package com.task.services
 
-import com.task.constants.Constants.API_KEY
+import com.example.notification.Constants.API_KEY
 import com.task.dto.MovieDetailsDTO
 import com.task.dto.MovieListDTO
 import retrofit2.Response

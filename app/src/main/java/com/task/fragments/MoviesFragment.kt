@@ -1,6 +1,6 @@
 package com.task.fragments
 
-import NotificationHelper
+import com.example.notification.NotificationHelper
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -32,11 +32,6 @@ class MoviesFragment : Fragment() {
   private val recyclerAdapter by lazy {
     RecyclerAdapter() { itemMovie ->
       getDataMovieSend(itemMovie.id!!)
-      lifecycleScope.launchWhenStarted {
-        delay(1000L)
-        NotificationHelper(requireContext(), "Thông tin phim", itemMovie.originalTitle.toString(),itemMovie.posterPath.toString()).CustomNotification()
-      }
-
       /*if (itemMovie.voteAverage!! >= 7.0)
         getDataMovieSend(itemMovie.id!!)
       else
@@ -48,7 +43,11 @@ class MoviesFragment : Fragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View? {
-    NotificationHelper(requireContext(), "Thông báo mới", "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine.").CustomNotification()
+    NotificationHelper(
+      requireContext(),
+      "Thông báo mới",
+      "Trong Coroutines của Kotlin, GlobalScope là một đối tượng toàn cục (global object) được sử dụng để khởi tạo các coroutine."
+    ).CustomNotification()
     binding = FragmentMoviesBinding.inflate(layoutInflater)
     initAdapter()
     return binding.root
